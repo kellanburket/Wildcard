@@ -8,10 +8,10 @@
 
 import Foundation
 
-internal class LinkAttribute: TextAttribute {
+public class LinkAttribute: TextAttribute {
     private var links: [String]?
     
-    internal init(pattern: String, var links: [String]?) {
+    public init(pattern: String, var links: [String]?) {
         self.links = links
         super.init(pattern: pattern, attribute: [NSObject: AnyObject]())
     }

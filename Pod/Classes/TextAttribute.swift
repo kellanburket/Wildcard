@@ -8,13 +8,13 @@
 
 import Foundation
 
-internal class TextAttribute: NSObject {
+public class TextAttribute: NSObject {
     var attribute: [NSObject: AnyObject]
     var pattern: String
     var matches = [RegExpMatch]()
     
     
-    internal init(pattern: String, attribute: [NSObject: AnyObject]) {
+    public init(pattern: String, attribute: [NSObject: AnyObject]) {
         self.attribute = attribute
         self.pattern = pattern
     }
