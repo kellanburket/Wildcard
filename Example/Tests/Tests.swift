@@ -38,7 +38,7 @@ class Tests: XCTestCase {
         }
         
         var testCase = "a".split(";")
-        XCTAssert(testCase is Array && testCase.count == 1 && testCase[0] == "a", "\(testCase)")
+        XCTAssert(testCase.count == 1 && testCase[0] == "a", "\(testCase)")
     }
     
     func testStringSub() {
@@ -181,8 +181,8 @@ class Tests: XCTestCase {
             "^[\\*\\-] (.+)": [listStyle]
         ]
         
-        var testString = "** headline **\r\n*italics*\r\n> ext1\r\n> ext3\r\n> ext3\r\n\r\n* bulleted list item\r\n- bulleted list item 2\r\n** headline *with italics* wow **"
-        var targetString = "headline\nitalics\next1ext3ext3\nbulleted list item\nbulleted list item 2\nheadline with italics wow"
+        var testString = "** headline **\r\n*italics*\r\n> ext1\r\n> ext3\r\n> ext3\r\n* bulleted list item\r\n- bulleted list item 2\r\n** headline *with italics* wow **"
+        var targetString = "headline\nitalics\next1ext3ext3bulleted list item\nbulleted list item 2\nheadline with italics wow"
         
         var attributedTestString = testString.attribute(attrs)
         
