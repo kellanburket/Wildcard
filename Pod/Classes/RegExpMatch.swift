@@ -8,9 +8,9 @@
 
 import Foundation
 
-typealias MatchTuple = (string: String, range: NSRange)
+internal typealias MatchTuple = (string: String, range: NSRange)
 
-func ==(right: RegExpMatch, left: RegExpMatch) -> Bool {
+internal func ==(right: RegExpMatch, left: RegExpMatch) -> Bool {
     return right.match.range.location == left.match.range.location
         && right.match.range.length == left.match.range.length
 }
@@ -22,13 +22,13 @@ internal class RegExpMatch: Equatable {
     var attributes = [TextAttribute]()
     var subexpressions = [RegExpMatch]()
     
-    init(pattern: String, match: MatchTuple, submatches: [MatchTuple]) {
+    internal init(pattern: String, match: MatchTuple, submatches: [MatchTuple]) {
         self.pattern = pattern
         self.submatches = submatches
         self.match = match
     }
     
-    var subrange: NSRange {
+    internal var subrange: NSRange {
         get {
             return submatches[0].range
         }
@@ -37,11 +37,11 @@ internal class RegExpMatch: Equatable {
         }
     }
     
-    var substring: String {
+    internal var substring: String {
         return submatches[0].string
     }
     
-    var fullrange: NSRange {
+    internal var fullrange: NSRange {
         get {
             return match.range
         }
@@ -51,11 +51,11 @@ internal class RegExpMatch: Equatable {
         }
     }
     
-    var fullstring: String {
+    internal var fullstring: String {
         return match.string
     }
     
-    func addSubexpression(var sub: RegExpMatch) {
+    internal func addSubexpression(var sub: RegExpMatch) {
         
         //println("\(sub.fullrange), \(sub.subrange): \(fullrange)")
         sub.fullrange = NSRange(
@@ -75,7 +75,7 @@ internal class RegExpMatch: Equatable {
         subexpressions.append(sub)
     }
     
-    func applyAttributes(inout string: NSMutableAttributedString) {
+    internal func applyAttributes(inout string: NSMutableAttributedString) {
         var finalAttributes = [NSObject: AnyObject]()
         
         for attribute in attributes {
@@ -91,10 +91,10 @@ internal class RegExpMatch: Equatable {
         string.setAttributes(finalAttributes, range: replacementRange)
     }
     
-    func formatSubexpressions(inout replacement: NSMutableAttributedString) {
+    internal func formatSubexpressions(inout replacement: NSMutableAttributedString) {
         if subexpressions.count > 0 {
             for sub in subexpressions {
-                println("\(replacement.mutableString): \(sub.pattern)")
+                //println("\(replacement.mutableString): \(sub.pattern)")
                 if let matches = RegExp(sub.pattern).getSubstringRanges(replacement) {
                     
                     for match in matches {
@@ -110,7 +110,7 @@ internal class RegExpMatch: Equatable {
         }
     }
     
-    class func nest(inout sets: [RegExpMatch]) {
+    internal class func nest(inout sets: [RegExpMatch]) {
         for setA in sets {
             for setB in sets {
                 if setA != setB {

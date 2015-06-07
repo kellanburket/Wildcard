@@ -43,7 +43,7 @@ public extension String {
         
         for (pattern, map) in patterns {
             if let matches = self.match(pattern) {
-                println("Matches \(matches)")
+                //println("Matches \(matches)")
                 if(matches.count == 4) {
                     var dictionary = [String:String]()
                     
@@ -111,7 +111,7 @@ public extension String {
     /**
         Substitute result of callback function for all occurences of pattern
     
-        :param: pattern a regular expression string to match against
+        :param: pattern an ICU-style regular expression
         :param: options a string containing option flags
             - i:    case-insenstive match
             - x:    ignore #-prefixed comments and whitespace in this pattern

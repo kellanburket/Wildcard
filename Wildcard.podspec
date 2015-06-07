@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Wildcard"
-  s.version          = "1.0.0"
+  s.version          = "1.0.1"
   s.summary          = "A RegExp(Regular Expressions) library for Swift"
   s.description      = <<-DESC
         Wildcard is a Swift RegExp(Regular Expressions) framework. It includes common utility methods for parsing and manipulating strings based on Ruby, Perl, and PHP's core string libraries:
@@ -21,6 +21,8 @@ Pod::Spec.new do |s|
         - `trim`, `ltrim`, `rtrim`
         - `toDate`
         - `decodeHtmlSpecialChars`
+
+        It also includes a Perl-style matching operators `string =~ pattern`.
 
         Currently, advanced text-attribution methods for parsing/styling HTML and custom mark-up languages are in the works and can be used (at your own caution) with `attribute` and `attributeHTML`.
                         DESC

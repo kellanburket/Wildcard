@@ -8,6 +8,9 @@
 
 import Foundation
 
+/**
+    Wrapper class for NSRegularExpression with convenience methods for common string-parsing operations
+*/
 public class RegExp {
 
     private var pattern: String = ""
@@ -16,22 +19,45 @@ public class RegExp {
     private var options: NSRegularExpressionOptions = NSRegularExpressionOptions.allZeros
     private var mOptions: NSMatchingOptions = NSMatchingOptions.allZeros
     private var regExp: NSRegularExpression?
+
+    /**
+        Initialize a new Regular Expression object with a pattern and options
+        
+        :param: pattern an ICU-style regular expression
+        :param: options a string containing option flags
+            - i:    case-insenstive match
+            - x:    ignore #-prefixed comments and whitespace in this pattern
+            - s:    `.` matches `\n`
+            - m:    `^`, `$` match the beginning and end of lines, respectively (set by default)
+            - w:    use unicode word boundaries
+            - c:    ignore metacharacters when matching (e.g, `\w`, `\d`, `\s`, etc..)
+            - l:    use only `\n` as a line separator
     
+    */
+    public init(_ pattern: String, _ options: String = "") {
+        setOptions("\(options)m")
+        self.pattern = pattern
+    }
+
+    /**
+        Convenience initializer for a MutableAttributedString
+    */
+    public convenience init(_ pattern: NSMutableAttributedString, _ options: String = "") {
+        self.init(pattern.mutableString as String)
+    }
+
     internal init(attributes: [TextAttribute], options: String = "") {
         setOptions("\(options)m")
         self.attributes = attributes
     }
     
-    public init(_ pattern: String, _ options: String = "") {
-        setOptions("\(options)m")
-        self.pattern = pattern
-    }
+    /**
+        Counts the number of matches in a string
+        
+        :param: input   an input string
     
-    public convenience init(_ pattern: NSMutableAttributedString, _ options: String = "") {
-        self.init(pattern.mutableString as String)
-    }
-
-    //Matching
+        :return:    the number of matches in the input string
+    */
     public func count(input: String) -> Int? {
         var capacity = Swift.count(input.utf16)
         
@@ -49,6 +75,13 @@ public class RegExp {
         return nil
     }
 
+    /**
+        Looks for the first ICU-style pattern match in the input string
+    
+        :param: input   an input string
+        
+        :return:    an array of matches or nil
+    */
     public func match(var input: String) -> [String]? {
         input = input.stringByReplacingOccurrencesOfString("\n", withString: "\\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
         
@@ -70,7 +103,14 @@ public class RegExp {
             default: return matches
         }
     }
-    
+
+    /**
+        Looks for all ICU-style pattern matches in the input string
+        
+        :param: input   an input string
+        
+        :return:    an array of an array of matches or nil
+    */
     public func scan(var input: String) -> [[String]]? {
         input = input.stringByReplacingOccurrencesOfString("\n", withString: "\\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
         
@@ -137,7 +177,15 @@ public class RegExp {
     internal func gsub(attributed: NSMutableAttributedString, _ replacement: String) -> NSMutableAttributedString {
         return NSMutableAttributedString(string: gsub(attributed.mutableString, replacement) as String)
     }
+
+    /**
+        Substitute all matches in input string with replacement string
+        
+        :param: input   an input string
+        :param: replacement replacement string (supports back references)
     
+        :return:    the modified input string
+    */
     public func gsub(string: String, _ replacement: String) -> String {
         return gsub(string.toMutable(), replacement) as String
     }
@@ -154,7 +202,15 @@ public class RegExp {
         }
         return mutable
     }
-    
+
+    /**
+        Substitute all matches in input string with return value of callback function
+        
+        :param: input   an input string
+        :param: callback    a callback function that takes a match as an argument and returns a modified string (does not support back references)
+        
+        :return:    the modified input string
+    */
     public func gsub(string: String, callback: ((String) -> (String))) -> String {
         return gsub(string.toMutable(), callback: callback) as String
     }
@@ -174,6 +230,14 @@ public class RegExp {
         return mutable
     }
     
+    /**
+        Substitute the first matches in input string with replacement string
+        
+        :param: input   an input string
+        :param: replacement replacement string (supports back references)
+        
+        :return:    the modified input string
+    */
     public func sub(string: String, _ replacement: String) -> String {
         var mutable = string.toMutable()
         
@@ -197,7 +261,14 @@ public class RegExp {
         return mutable as String
     }
     
-    //Attribution
+
+    /**
+        Apply text attribution to an input string
+    
+        :param: input   an input string
+    
+        :return:    A mutable attributed string
+    */
     public func attribute(var input: String) -> NSMutableAttributedString {
         removeLinebreaks(&input)
         var capacity = Swift.count(input.utf16)

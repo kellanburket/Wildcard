@@ -14,12 +14,12 @@ internal class TextAttribute: NSObject {
     var matches = [RegExpMatch]()
     
     
-    init(pattern: String, attribute: [NSObject: AnyObject]) {
+    internal init(pattern: String, attribute: [NSObject: AnyObject]) {
         self.attribute = attribute
         self.pattern = pattern
     }
     
-    func addMatch(input: String, _ full: NSRange, _ sub: NSRange) {
+    internal func addMatch(input: String, _ full: NSRange, _ sub: NSRange) {
         var match = RegExpMatch(
             pattern: pattern,
             match: (input.substringWithNSRange(full), full),
@@ -31,11 +31,11 @@ internal class TextAttribute: NSObject {
         matches.append(match)
     }
     
-    func getAttributes()  -> [NSObject: AnyObject]? {
+    internal func getAttributes()  -> [NSObject: AnyObject]? {
         return attribute
     }
     
-    class func nest(attributes: [TextAttribute]) -> [RegExpMatch] {
+    internal class func nest(attributes: [TextAttribute]) -> [RegExpMatch] {
         var sets = [RegExpMatch]()
         
         for attr in attributes {
