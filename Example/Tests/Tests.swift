@@ -181,11 +181,19 @@ class Tests: XCTestCase {
             "^[\\*\\-] (.+)": [listStyle]
         ]
         
-        var testString = "** headline **\r\n*italics*\r\n> ext1\r\n> ext3\r\n> ext3\r\n* bulleted list item\r\n- bulleted list item 2\r\n** headline *with italics* wow **"
-
+        var testString = "** headline **\r\n*italics*\r\n> ext1\r\n> ext3\r\n> ext3\r\n\r\n* bulleted list item\r\n- bulleted list item 2\r\n** headline *with italics* wow **"
+        var targetString = "headline\nitalics\next1ext3ext3\nbulleted list item\nbulleted list item 2\nheadline with italics wow"
+        
         var attributedTestString = testString.attribute(attrs)
-        println("Checking Attributed Test String:")
-        println("\(attributedTestString)")
+        
+        XCTAssertEqual(attributedTestString.string, targetString, attributedTestString.string)
+
+        var testHtmlString = "<p>headline</p>"
+        var targetHtmlString = "headline"
+        
+        var attributedHtmlString = testHtmlString.attributeHtml()
+        
+        XCTAssertEqual(attributedHtmlString.string, targetHtmlString, attributedHtmlString.string)
     }
     
     func testHtmlDecoding() {
@@ -195,14 +203,16 @@ class Tests: XCTestCase {
         
         XCTAssertEqual(testString, targetString, testString)
     }
-
     
-    /*
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock() {
-            // Put the code you want to measure the time of here.
-        }
+    func testOperators() {
+        var testString = "aabbbccddd"
+        var testPattern = "(\\w{2})\\w"
+        
+        XCTAssert(testString =~ testPattern, "No matches for `\(testPattern)` in '\(testString)'")
+
+        //var testCase1 = testString[testPattern]
+        //var testCase2 = testString[testPattern, 1]
+        //XCTAssertEqual(testCase1, "aab", testCase1)
+        //XCTAssertEqual(testCase2, "ccd", testCase2)
     }
-    */
 }

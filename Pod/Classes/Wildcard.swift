@@ -13,7 +13,7 @@ private let RestrictedRegexCharacters: [Character] = [
 ]
 
 internal extension NSRange {
-    func toStringIndexRange(input: String) -> Range<String.Index> {
+    internal func toStringIndexRange(input: String) -> Range<String.Index> {
         //println("\(location + length), \(input.utf16Count)")
         var startIndex = advance(input.startIndex, location)
         var endIndex = advance(input.startIndex, location + length)
@@ -21,18 +21,6 @@ internal extension NSRange {
         //println(input.substringWithRange(range))
         return range
     }
-}
-
-private func cleanPatternString(pattern: String) -> String {
-    var parsedPattern = ""
-    for d in pattern.unicodeScalars {
-        if contains(RestrictedRegexCharacters, Character(d)) {
-            parsedPattern += "\\\(d)"
-        } else {
-            parsedPattern.append(d)
-        }
-    }
-    return parsedPattern
 }
 
 public extension String {
@@ -362,12 +350,11 @@ public extension String {
         
         return self.attribute(parsedAttributes)
     }
-    
 
     internal func attribute(attributes: [TextAttribute]) -> NSAttributedString {
         return RegExp(attributes: attributes).attribute(self)
     }
-
+    
     internal func substringWithNSRange(range: NSRange) -> String {
         return substringWithRange(range.toStringIndexRange(self))
     }
@@ -388,17 +375,59 @@ public extension String {
         return NSMakeRange(0, capacity)
     }
 
-    public subscript(pattern: String) -> [[String]]? {
+    /*
+    /**
+        Convenience subscript operator for accessing the full pattern match
+        
+        :param: pattern pattern to match against
+        
+        :return:    return the full match or nil, if none exist
+    */
+    public subscript(pattern: String) -> String? {
         get {
-            return scan(pattern)
+            if let matches = match(pattern) {
+            return matches[0]
+        }
+        
+        return nil
         }
     }
     
-    public subscript(pattern: String, replacement: String) -> String {
+    /**
+    Convenience subscript operator for accessing a particular subpattern match
+    
+        :param: pattern pattern with subpatterns to match against
+        :param: index   the subpattern index to retrieve
+        
+    :return:    return the subpattern match or nil, if none exist
+    */
+    public subscript(pattern: String, index: Int) -> String? {
         get {
-            return gsub(pattern, replacement)
+            if let matches = self.match(pattern) {
+                if matches.count > index && index >= 0 {
+                    return matches[index]
+                }
+            }
+        
+            return nil
         }
     }
+    */
+
+}
+
+infix operator =~ { associativity left precedence 140 }
+
+/**
+    Checks if the input matches the pattern
+
+    :param: left   the input string
+    :param: right    the pattern
+
+    :return:    returns true if pattern exists in the input string
+*/
+public func =~(left: String, right: String) -> Bool {
+    return left.match(right) != nil
 }
 
 public extension NSMutableString {

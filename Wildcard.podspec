@@ -9,18 +9,26 @@
 
 Pod::Spec.new do |s|
   s.name             = "Wildcard"
-  s.version          = "0.1.0"
-  s.summary          = "A Regular Expressions library for Swift"
+  s.version          = "1.0.0"
+  s.summary          = "A RegExp(Regular Expressions) library for Swift"
   s.description      = <<-DESC
-                       An optional longer description of Wildcard
+        Wildcard is a Swift RegExp(Regular Expressions) framework. It includes common utility methods for parsing and manipulating strings based on Ruby, Perl, and PHP's core string libraries:
 
+        - `gsub`, `gsubi`, `sub`, `subi`
+        - `match`, `scan`
+        - `slice`
+        - `split`
+        - `trim`, `ltrim`, `rtrim`
+        - `toDate`
+        - `decodeHtmlSpecialChars`
 
-                       DESC
+        Currently, advanced text-attribution methods for parsing/styling HTML and custom mark-up languages are in the works and can be used (at your own caution) with `attribute` and `attributeHTML`.
+                        DESC
   s.homepage         = "https://github.com/kellanburket/Wildcard"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
-  s.author           = { "Kellan Cummings" => "kellan.cummings@gmail.com" }
-  s.source           = { :git => "https://github.com/<GITHUB_USERNAME>/Wildcard.git", :tag => s.version.to_s }
+  s.author           = { "Kellan Cummings" => "kellan.burket@gmail.com" }
+  s.source           = { :git => "https://github.com/kellabburket/Wildcard.git", :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.platform     = :ios, '8.0'
