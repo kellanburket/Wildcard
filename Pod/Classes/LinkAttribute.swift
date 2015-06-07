@@ -8,9 +8,18 @@
 
 import Foundation
 
+/**
+    Wrapper class for Text Attribute Links
+*/
 public class LinkAttribute: TextAttribute {
     private var links: [String]?
     
+    /**
+        Initialize a LinkAttribute with a pattern and links
+        
+        :param: pattern pattern to match against
+        :param: links   
+    */
     public init(pattern: String, var links: [String]?) {
         self.links = links
         super.init(pattern: pattern, attribute: [NSObject: AnyObject]())

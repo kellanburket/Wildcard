@@ -8,29 +8,29 @@
 
 import UIKit
 
-private let RestrictedRegexCharacters: [Character] = [
-    "[", ".", "+", "*", "/", "{", "\\", "(", ")", "|", "$", "^"
-]
 
-internal extension NSRange {
-    internal func toStringIndexRange(input: String) -> Range<String.Index> {
-        //println("\(location + length), \(input.utf16Count)")
-        var startIndex = advance(input.startIndex, location)
-        var endIndex = advance(input.startIndex, location + length)
-        var range = Range(start: startIndex, end: endIndex)
-        //println(input.substringWithRange(range))
-        return range
-    }
+infix operator =~ { associativity left precedence 140 }
+
+/**
+    Checks if the input matches the pattern
+
+    :param: left   the input string
+    :param: right    the pattern
+
+    :return:    returns true if pattern exists in the input string
+*/
+public func =~(left: String, right: String) -> Bool {
+    return left.match(right) != nil
 }
 
 public extension String {
     
     /**
         Convert a string into an NSDate object. Currently supports both backslashes and hyphens in the following formats:
-            - Y-m-d
-            - m-d-Y
-            - Y-n-j
-            - n-j-Y
+        * Y-m-d
+        * m-d-Y
+        * Y-n-j
+        * n-j-Y
         
         :return: a date
     */
@@ -74,9 +74,9 @@ public extension String {
     }
 
     /**
-        Split a string into an array of strings by slicing at a delimiter
+        Split a string into an array of strings by slicing at delimiter
     
-        :param: delimiter
+        :param: delimiter   character(s) to split string at
 
         :return: an array of strings if delimiter matches, or an array with the original string as its only component
     */
@@ -113,13 +113,13 @@ public extension String {
     
         :param: pattern an ICU-style regular expression
         :param: options a string containing option flags
-            - i:    case-insenstive match
-            - x:    ignore #-prefixed comments and whitespace in this pattern
-            - s:    `.` matches `\n`
-            - m:    `^`, `$` match the beginning and end of lines, respectively (set by default)
-            - w:    use unicode word boundaries
-            - c:    ignore metacharacters when matching (e.g, `\w`, `\d`, `\s`, etc..)
-            - l:    use only `\n` as a line separator
+        * i:    case-insenstive match
+        * x:    ignore #-prefixed comments and whitespace in this pattern
+        * s:    `.` matches `\n`
+        * m:    `^`, `$` match the beginning and end of lines, respectively (set by default)
+        * w:    use unicode word boundaries
+        * c:    ignore metacharacters when matching (e.g, `\w`, `\d`, `\s`, etc..)
+        * l:    use only `\n` as a line separator
         :param: callback    a callback function to call on pattern match success
         
         :return:    modified string
@@ -182,7 +182,7 @@ public extension String {
         Scans and matches only the first pattern
 
         :param: pattern the pattern to search against
-        :options:   (not-required) options for matching--see documentation for `gsub`; defaults to ""
+        :param:   (not-required) options for matching--see documentation for `gsub`; defaults to ""
     
         :return:    an array of all matches to the first pattern
     */
@@ -194,7 +194,7 @@ public extension String {
         Scans and matches all patterns
 
         :param: pattern the pattern to search against
-        :options:   (not-required) options for matching--see documentation for `gsub`; defaults to ""
+        :param:   (not-required) options for matching--see documentation for `gsub`; defaults to ""
     
         :return:    an array of arrays of each matched pattern
     */
@@ -252,13 +252,13 @@ public extension String {
     }
 
     /**
-        Add attributes to a string where the pattern matches
-        
+        Attribute matched subpatterns and trim
+    
         :param: a dictionary with the pattern as the key and a dictionary of attributes as values. The following keys can be applied to the values dictionary:
     
-            - NSFontAttributeName
-            - NSForegroundColorAttributeName
-            - NSParagraphStyleAttributeName
+        * NSFontAttributeName
+        * NSForegroundColorAttributeName
+        * NSParagraphStyleAttributeName
     
         :return: an attributed string with styles applied
     */
@@ -284,6 +284,17 @@ public extension String {
         return RegExp(attributes: textAttrs).attribute(self)
     }
 
+    /**
+        Attribute matched subpatterns and trim
+        
+        :param: an array of TextAttribute objects
+    
+        :return: an attributed string with styles applied
+    */
+    public func attribute(attributes: [TextAttribute]) -> NSAttributedString {
+        return RegExp(attributes: attributes).attribute(self)
+    }
+    
     /**
         Converts Html special characters to their ASCII equivalents
     
@@ -351,10 +362,6 @@ public extension String {
         return self.attribute(parsedAttributes)
     }
 
-    internal func attribute(attributes: [TextAttribute]) -> NSAttributedString {
-        return RegExp(attributes: attributes).attribute(self)
-    }
-    
     internal func substringWithNSRange(range: NSRange) -> String {
         return substringWithRange(range.toStringIndexRange(self))
     }
@@ -416,22 +423,8 @@ public extension String {
 
 }
 
-infix operator =~ { associativity left precedence 140 }
-
-/**
-    Checks if the input matches the pattern
-
-    :param: left   the input string
-    :param: right    the pattern
-
-    :return:    returns true if pattern exists in the input string
-*/
-public func =~(left: String, right: String) -> Bool {
-    return left.match(right) != nil
-}
-
-public extension NSMutableString {
-    public func gsub(pattern: String, _ replacement: String) -> NSMutableString {
+internal extension NSMutableString {
+    internal func gsub(pattern: String, _ replacement: String) -> NSMutableString {
         var regex = RegExp(pattern)
         return regex.gsub(self, replacement)
     }
@@ -441,8 +434,19 @@ public extension NSMutableString {
     }
 }
 
-public extension NSMutableAttributedString {
+internal extension NSMutableAttributedString {
     internal func substringRanges(pattern: String, _ options: String = "") -> [RegExpMatch]? {
         return RegExp(pattern, options).getSubstringRanges(self)
+    }
+}
+
+internal extension NSRange {
+    internal func toStringIndexRange(input: String) -> Range<String.Index> {
+        //println("\(location + length), \(input.utf16Count)")
+        var startIndex = advance(input.startIndex, location)
+        var endIndex = advance(input.startIndex, location + length)
+        var range = Range(start: startIndex, end: endIndex)
+        //println(input.substringWithRange(range))
+        return range
     }
 }

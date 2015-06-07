@@ -8,12 +8,20 @@
 
 import Foundation
 
+/**
+    Wrapper class for Text Attributes
+*/
 public class TextAttribute: NSObject {
-    var attribute: [NSObject: AnyObject]
-    var pattern: String
-    var matches = [RegExpMatch]()
+    internal var attribute: [NSObject: AnyObject]
+    internal var pattern: String
+    internal var matches = [RegExpMatch]()
     
-    
+    /**
+        Initialize a TextAttribute with a pattern and links
+        
+        :param: pattern pattern to match against
+        :param: a dictionary of attributes
+    */
     public init(pattern: String, attribute: [NSObject: AnyObject]) {
         self.attribute = attribute
         self.pattern = pattern

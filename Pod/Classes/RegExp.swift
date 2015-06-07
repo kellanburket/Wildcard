@@ -25,13 +25,13 @@ public class RegExp {
         
         :param: pattern an ICU-style regular expression
         :param: options a string containing option flags
-            - i:    case-insenstive match
-            - x:    ignore #-prefixed comments and whitespace in this pattern
-            - s:    `.` matches `\n`
-            - m:    `^`, `$` match the beginning and end of lines, respectively (set by default)
-            - w:    use unicode word boundaries
-            - c:    ignore metacharacters when matching (e.g, `\w`, `\d`, `\s`, etc..)
-            - l:    use only `\n` as a line separator
+        * i:    case-insenstive match
+        * x:    ignore #-prefixed comments and whitespace in this pattern
+        * s:    `.` matches `\n`
+        * m:    `^`, `$` match the beginning and end of lines, respectively (set by default)
+        * w:    use unicode word boundaries
+        * c:    ignore metacharacters when matching (e.g, `\w`, `\d`, `\s`, etc..)
+        * l:    use only `\n` as a line separator
     
     */
     public init(_ pattern: String, _ options: String = "") {
@@ -346,7 +346,7 @@ public class RegExp {
         return nil
     }
     
-    //TODO: Find out what these do and use them or don't
+    ///TODO: Find out what these do and use them or don't
     private func setMatchingOptions(flags: String) -> NSMatchingOptions {
         var options = NSMatchingOptions.allZeros
         /*
