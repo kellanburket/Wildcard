@@ -1,0 +1,14 @@
+PODS:
+  - Wildcard (0.1.0)
+
+DEPENDENCIES:
+  - Wildcard (from `../`)
+
+EXTERNAL SOURCES:
+  Wildcard:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Wildcard: 36a3c59f7a3f5b5453b8bb08ce536379f8a37f80
+
+COCOAPODS: 0.37.2

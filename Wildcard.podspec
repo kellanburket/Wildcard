@@ -10,14 +10,13 @@
 Pod::Spec.new do |s|
   s.name             = "Wildcard"
   s.version          = "0.1.0"
-  s.summary          = "A short description of Wildcard."
+  s.summary          = "A Regular Expressions library for Swift"
   s.description      = <<-DESC
                        An optional longer description of Wildcard
 
-                       * Markdown format.
-                       * Don't worry about the indent, we strip it!
+
                        DESC
-  s.homepage         = "https://github.com/<GITHUB_USERNAME>/Wildcard"
+  s.homepage         = "https://github.com/kellanburket/Wildcard"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
   s.author           = { "Kellan Cummings" => "kellan.cummings@gmail.com" }
