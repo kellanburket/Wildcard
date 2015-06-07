@@ -10,7 +10,7 @@
 Pod::Spec.new do |s|
   s.name             = "Wildcard"
   s.version          = "1.0.1"
-  s.summary          = "A RegExp(Regular Expressions) library for Swift"
+  s.summary          = "A RegExp framework for Swift"
   s.description      = <<-DESC
         Wildcard is a Swift RegExp(Regular Expressions) framework. It includes common utility methods for parsing and manipulating strings based on Ruby, Perl, and PHP's core string libraries:
 
@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
   s.author           = { "Kellan Cummings" => "kellan.burket@gmail.com" }
-  s.source           = { :git => "https://github.com/kellabburket/Wildcard.git", :tag => s.version.to_s }
+  s.source           = { :git => "https://github.com/kellanburket/Wildcard.git", :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.platform     = :ios, '8.0'
