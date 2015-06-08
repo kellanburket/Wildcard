@@ -9,22 +9,12 @@
 
 Pod::Spec.new do |s|
   s.name             = "Wildcard"
-  s.version          = "1.0.2"
-  s.summary          = "A RegExp framework for Swift"
+  s.version          = "1.0.3"
+  s.summary          = "A RegEx framework for Swift"
   s.description      = <<-DESC
-        Wildcard is a Swift RegExp(Regular Expressions) framework. It includes common utility methods for parsing and manipulating strings based on Ruby, Perl, and PHP's core string libraries:
+        Wildcard is a Swift RegEx(Regular Expressions) framework. It includes common utility methods for parsing and manipulating strings based on Ruby, Perl, and PHP's core string libraries as well as a Perl-style matching operator `string =~ pattern`.
 
-        - `gsub`, `gsubi`, `sub`, `subi`
-        - `match`, `scan`
-        - `slice`
-        - `split`
-        - `trim`, `ltrim`, `rtrim`
-        - `toDate`
-        - `decodeHtmlSpecialChars`
-
-        It also includes a Perl-style matching operators `string =~ pattern`.
-
-        Currently, advanced text-attribution methods for parsing/styling HTML and custom mark-up languages are in the works and can be used (at your own caution) with `attribute` and `attributeHTML`.
+        Currently, advanced text-attribution methods for parsing/styling HTML and custom mark-up languages are in the works and can be used at your own caution.
                         DESC
   s.homepage         = "https://github.com/kellanburket/Wildcard"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"

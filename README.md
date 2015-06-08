@@ -22,7 +22,7 @@ pod "Wildcard"
 
 ## Author
 
-Kellan Cummings, kellan.cummings@gmail.com
+Kellan Cummings, kellan.burket@gmail.com
 
 ## License
 

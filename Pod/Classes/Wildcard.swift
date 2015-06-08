@@ -305,14 +305,13 @@ public extension String {
         
         return regex.gsub(self) { pattern in
             var hex = RegExp("[a-fA-F\\d]+")
-            var matches = hex.match(pattern)
-            
-            if let match = matches?[0] {
-                if let sint = match.toInt() {
+            if let matches = hex.match(pattern) {
+                if let sint = matches[0].toInt() {
                     var character = Character(UnicodeScalar(UInt32(sint)))
                     return "\(character)"
                 }
             }
+            println("There was an issue while trying to decode character '\(pattern)'")
             return ""
         }
     }
@@ -325,8 +324,7 @@ public extension String {
         :return:    an attributed strings without html tags
     */
     public func attributeHtml(map: [String:[AnyObject]] = [String:[AnyObject]]()) -> NSAttributedString {
-        
-        var str = self.gsub("\\<.*br>", "\n").decodeHtmlSpecialCharacters()
+        var str = self.decodeHtmlSpecialCharacters().gsub("\\<.*br>", "\n")
         
         var paragraphStyle = NSParagraphStyle()
         paragraphStyle.setValue(CGFloat(17), forKey: "firstLineHeadIndent")
@@ -340,11 +338,22 @@ public extension String {
         
         var attributes: [String:[AnyObject]] = [
             "li": [listStyle],
-            "(?:b|bold|strong)": [UIFont.boldSystemFontOfSize(12)],
-            "(?:i)": [UIFont.italicSystemFontOfSize(12)],
+            "b": [UIFont.boldSystemFontOfSize(12)],
+            "bold": [UIFont.boldSystemFontOfSize(12)],
+            "strong": [UIFont.boldSystemFontOfSize(12)],
+            "i": [UIFont.italicSystemFontOfSize(12)],
             "a": [UIFont.systemFontOfSize(12)],
-            "(?:p|ul|ol|div|section|main)": [paragraphStyle],
-            "h\\d+": [UIFont.boldSystemFontOfSize(14)],
+            "p": [paragraphStyle],
+            "ul": [paragraphStyle],
+            "ol": [paragraphStyle],
+            "div": [paragraphStyle],
+            "section": [paragraphStyle],
+            "main": [paragraphStyle],
+            "h1": [UIFont.boldSystemFontOfSize(24)],
+            "h2": [UIFont.boldSystemFontOfSize(20)],
+            "h3": [UIFont.italicSystemFontOfSize(18)],
+            "h4": [UIFont.boldSystemFontOfSize(16)],
+            "h5": [UIFont.systemFontOfSize(15)],
         ]
         
         for (k, v) in map {
@@ -359,7 +368,7 @@ public extension String {
             parsedAttributes["\\<\(el).*?>(.+?)\\<\\/\(el)>"] = attr
         }
         
-        return self.attribute(parsedAttributes)
+        return str.attribute(parsedAttributes)
     }
 
     internal func substringWithNSRange(range: NSRange) -> String {
