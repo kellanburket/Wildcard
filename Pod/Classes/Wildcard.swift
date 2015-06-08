@@ -27,6 +27,7 @@ public extension String {
     
     /**
         Convert a string into an NSDate object. Currently supports both backslashes and hyphens in the following formats:
+        
         * Y-m-d
         * m-d-Y
         * Y-n-j
@@ -113,6 +114,7 @@ public extension String {
     
         :param: pattern an ICU-style regular expression
         :param: options a string containing option flags
+        
         * i:    case-insenstive match
         * x:    ignore #-prefixed comments and whitespace in this pattern
         * s:    `.` matches `\n`
@@ -120,6 +122,7 @@ public extension String {
         * w:    use unicode word boundaries
         * c:    ignore metacharacters when matching (e.g, `\w`, `\d`, `\s`, etc..)
         * l:    use only `\n` as a line separator
+        
         :param: callback    a callback function to call on pattern match success
         
         :return:    modified string
@@ -254,15 +257,17 @@ public extension String {
     /**
         Attribute matched subpatterns and trim
     
-        :param: a dictionary with the pattern as the key and a dictionary of attributes as values. The following keys can be applied to the values dictionary:
+        :param: attributes  a dictionary with the pattern as the key and an array of style attributes as values. The following are accepted:
     
-        * NSFontAttributeName
-        * NSForegroundColorAttributeName
-        * NSParagraphStyleAttributeName
+        * UIFont    set the font
+        * NSParagraphStyle  set paragraph styling
+        * UIColor   set font color
+    
+        :param: font    (optional) default font
     
         :return: an attributed string with styles applied
     */
-    public func attribute(attributes: [String: [AnyObject]]) -> NSAttributedString {
+    public func attribute(attributes: [String: [AnyObject]], font: UIFont? = nil) -> NSAttributedString {
         var textAttrs = [TextAttribute]()
 
         for (pattern, attrs) in attributes {
@@ -281,22 +286,23 @@ public extension String {
             textAttrs.append(TextAttribute(pattern: pattern, attribute: map))
         }
         
-        return RegExp(attributes: textAttrs).attribute(self)
+        return RegExp(attributes: textAttrs).attribute(self, font: font)
     }
 
     /**
         Attribute matched subpatterns and trim
         
-        :param: an array of TextAttribute objects
+        :param: attributes  an array of TextAttribute objects
+        :param: font    default font
     
         :return: an attributed string with styles applied
     */
-    public func attribute(attributes: [TextAttribute]) -> NSAttributedString {
-        return RegExp(attributes: attributes).attribute(self)
+    public func attribute(attributes: [TextAttribute], font: UIFont? = nil) -> NSAttributedString {
+        return RegExp(attributes: attributes).attribute(self, font: font)
     }
     
     /**
-        Converts Html special characters to their ASCII equivalents
+        Converts Html special characters (e.g. '&#169;' => '©')
     
         :return:    converted string
     */
@@ -317,9 +323,39 @@ public extension String {
     }
 
     /**
-        Helper method that parses an Html string and converts it to an attributed string
+        Helper method that parses an Html string and converts it to an attributed string. Currently the default styles are as follows:
+    
+            * p, ul, ol, div, section, main:
 
-        :param: map (optional) a map of patterns: text attributes
+                * paragraph style:
+                
+                    * firstLineHeadIndent:  17
+                    * headIndent:   20
+                    * paragraphSpacing: 12
+    
+            * li
+    
+                * paragraph style:
+    
+                    * firstLineHeadIndent:  20
+                    * headIndent:   30
+                    * paragraphSpacing: 7
+
+            * b, bold, strong:  boldSystemFontOfSize(12)
+            * i, em:    italicSystemFontOfSize(12)
+            * h1:   boldSystemFontOfSize(24)
+            * h2:   boldSystemFontOfSize(20)
+            * h3:   italicSystemFontOfSize(18)
+            * h4:   boldSystemFontOfSize(16)
+            * h5:   systemFontOfSize(15)
+
+        :param: map override default html properties passing in an array of variables which can be either NSParagraphStyle, UIFont, or UIColor variables. For example, to set `p` to 16pt system font with 16pts between paragraphs:
+    
+                var str = "Hello World"
+                var style = NSParagraphStyle()
+                style.setValue(CGFloat(16), forKey: "paragraphSpacing")
+                var font = UIFont.systemFontOfSize(16)
+                var attrStr = str.attributeHtml(map: ["p": [style, font]])
     
         :return:    an attributed strings without html tags
     */
@@ -342,6 +378,7 @@ public extension String {
             "bold": [UIFont.boldSystemFontOfSize(12)],
             "strong": [UIFont.boldSystemFontOfSize(12)],
             "i": [UIFont.italicSystemFontOfSize(12)],
+            "em": [UIFont.italicSystemFontOfSize(12)],
             "a": [UIFont.systemFontOfSize(12)],
             "p": [paragraphStyle],
             "ul": [paragraphStyle],

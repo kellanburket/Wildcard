@@ -9,7 +9,7 @@
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
-## Requirements
+The string extensions can be used out of the box. Import `Wildcard` to use custom classes or operators.
 
 ## Installation
 
@@ -30,14 +30,8 @@ Wildcard is available under the MIT license. See the LICENSE file for more info.
 
 ## About
 
-Wildcard is a Swift RegExp(Regular Expressions) framework. It includes common utility methods for parsing and manipulating strings based on Ruby, Perl, and PHP's core string libraries:
+Wildcard is a Swift RegEx framework. It includes common utility methods for parsing and manipulating strings based on Ruby, Perl, and PHP's core string libraries.
 
-    - `gsub`, `gsubi`, `sub`, `subi`
-    - `match`, `scan`
-    - `slice`
-    - `split`
-    - `trim`, `ltrim`, `rtrim`
-    - `toDate`
-    - `decodeHtmlSpecialChars`
+Currently, advanced text-attribution methods for parsing/styling HTML and custom mark-up languages are in the works and can be used at your own caution.
 
-Currently, advanced text-attribution methods for parsing/styling HTML and custom mark-up languages are in the works and can be used (at your own caution) with `attribute` and `attributeHTML`.
+Documentation available at (CocoaDocs)[http://cocoadocs.org/docsets/Wildcard/]

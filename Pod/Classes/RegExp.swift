@@ -25,6 +25,7 @@ public class RegExp {
         
         :param: pattern an ICU-style regular expression
         :param: options a string containing option flags
+        
         * i:    case-insenstive match
         * x:    ignore #-prefixed comments and whitespace in this pattern
         * s:    `.` matches `\n`
@@ -266,14 +267,22 @@ public class RegExp {
         Apply text attribution to an input string
     
         :param: input   an input string
+        :param: font    set the default font
     
         :return:    A mutable attributed string
     */
-    public func attribute(var input: String) -> NSMutableAttributedString {
+    public func attribute(var input: String, font: UIFont? = nil) -> NSMutableAttributedString {
         removeLinebreaks(&input)
+        
         var capacity = Swift.count(input.utf16)
         
         var attributedText = NSMutableAttributedString(string: input)
+        
+        attributedText.addAttribute(
+            NSFontAttributeName,
+            value: font ?? UIFont.systemFontOfSize(14),
+            range: NSMakeRange(0, attributedText.length)
+        )
         
         for attribute in attributes {
             self.pattern = attribute.pattern
