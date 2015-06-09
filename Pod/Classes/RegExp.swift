@@ -21,11 +21,8 @@ public class RegExp {
     private var regExp: NSRegularExpression?
 
     /**
-        Initialize a new Regular Expression object with a pattern and options
-        
-        :param: pattern an ICU-style regular expression
-        :param: options a string containing option flags
-        
+        Initialize a new Regular Expression object with a pattern and options. The following flags are permitted:
+    
         * i:    case-insenstive match
         * x:    ignore #-prefixed comments and whitespace in this pattern
         * s:    `.` matches `\n`
@@ -33,6 +30,9 @@ public class RegExp {
         * w:    use unicode word boundaries
         * c:    ignore metacharacters when matching (e.g, `\w`, `\d`, `\s`, etc..)
         * l:    use only `\n` as a line separator
+    
+        :param: pattern an ICU-style regular expression
+        :param: options a string containing option flags
     
     */
     public init(_ pattern: String, _ options: String = "") {
@@ -57,7 +57,7 @@ public class RegExp {
         
         :param: input   an input string
     
-        :return:    the number of matches in the input string
+        :returns:    the number of matches in the input string
     */
     public func count(input: String) -> Int? {
         var capacity = Swift.count(input.utf16)
@@ -81,7 +81,7 @@ public class RegExp {
     
         :param: input   an input string
         
-        :return:    an array of matches or nil
+        :returns:    an array of matches or nil
     */
     public func match(var input: String) -> [String]? {
         input = input.stringByReplacingOccurrencesOfString("\n", withString: "\\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
@@ -110,7 +110,7 @@ public class RegExp {
         
         :param: input   an input string
         
-        :return:    an array of an array of matches or nil
+        :returns:    an array of an array of matches or nil
     */
     public func scan(var input: String) -> [[String]]? {
         input = input.stringByReplacingOccurrencesOfString("\n", withString: "\\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
@@ -185,7 +185,7 @@ public class RegExp {
         :param: input   an input string
         :param: replacement replacement string (supports back references)
     
-        :return:    the modified input string
+        :returns:    the modified input string
     */
     public func gsub(string: String, _ replacement: String) -> String {
         return gsub(string.toMutable(), replacement) as String
@@ -210,7 +210,7 @@ public class RegExp {
         :param: input   an input string
         :param: callback    a callback function that takes a match as an argument and returns a modified string (does not support back references)
         
-        :return:    the modified input string
+        :returns:    the modified input string
     */
     public func gsub(string: String, callback: ((String) -> (String))) -> String {
         return gsub(string.toMutable(), callback: callback) as String
@@ -237,7 +237,7 @@ public class RegExp {
         :param: input   an input string
         :param: replacement replacement string (supports back references)
         
-        :return:    the modified input string
+        :returns:    the modified input string
     */
     public func sub(string: String, _ replacement: String) -> String {
         var mutable = string.toMutable()
@@ -269,7 +269,7 @@ public class RegExp {
         :param: input   an input string
         :param: font    set the default font
     
-        :return:    A mutable attributed string
+        :returns:    A mutable attributed string
     */
     public func attribute(var input: String, font: UIFont? = nil) -> NSMutableAttributedString {
         removeLinebreaks(&input)

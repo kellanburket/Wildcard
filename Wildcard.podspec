@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Wildcard"
-  s.version          = "1.0.4"
+  s.version          = "1.0.5"
   s.summary          = "A RegEx framework for Swift"
   s.description      = <<-DESC
         Wildcard is a Swift RegEx(Regular Expressions) framework. It includes common utility methods for parsing and manipulating strings based on Ruby, Perl, and PHP's core string libraries as well as a Perl-style matching operator `string =~ pattern`.

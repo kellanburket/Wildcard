@@ -17,7 +17,7 @@ infix operator =~ { associativity left precedence 140 }
     :param: left   the input string
     :param: right    the pattern
 
-    :return:    returns true if pattern exists in the input string
+    :returns:    returns true if pattern exists in the input string
 */
 public func =~(left: String, right: String) -> Bool {
     return left.match(right) != nil
@@ -33,7 +33,7 @@ public extension String {
         * Y-n-j
         * n-j-Y
         
-        :return: a date
+        :returns: a date
     */
     public func toDate() -> NSDate? {
 
@@ -79,7 +79,7 @@ public extension String {
     
         :param: delimiter   character(s) to split string at
 
-        :return: an array of strings if delimiter matches, or an array with the original string as its only component
+        :returns: an array of strings if delimiter matches, or an array with the original string as its only component
     */
     public func split(delimiter: String) -> [String] {
         var parsedDelimiter: String = NSRegularExpression.escapedPatternForString(delimiter)
@@ -102,7 +102,7 @@ public extension String {
         :param: pattern a regular expression string to match against
         :param: callback    a callback function to call on pattern match success
         
-        :return:    modified string
+        :returns:    modified string
     */
     public func gsub(pattern: String, callback: ((String) -> (String))) -> String {
         var regex = RegExp(pattern)
@@ -110,11 +110,8 @@ public extension String {
     }
     
     /**
-        Substitute result of callback function for all occurences of pattern
-    
-        :param: pattern an ICU-style regular expression
-        :param: options a string containing option flags
-        
+        Substitute result of callback function for all occurences of pattern. The following flags are permitted:
+
         * i:    case-insenstive match
         * x:    ignore #-prefixed comments and whitespace in this pattern
         * s:    `.` matches `\n`
@@ -122,10 +119,12 @@ public extension String {
         * w:    use unicode word boundaries
         * c:    ignore metacharacters when matching (e.g, `\w`, `\d`, `\s`, etc..)
         * l:    use only `\n` as a line separator
-        
+    
+        :param: pattern an ICU-style regular expression
+        :param: options a string containing option flags
         :param: callback    a callback function to call on pattern match success
         
-        :return:    modified string
+        :returns:    modified string
     */
     public func gsub(pattern: String, options: String, callback: ((String) -> (String))) -> String {
         var regex = RegExp(pattern, options)
@@ -187,7 +186,7 @@ public extension String {
         :param: pattern the pattern to search against
         :param:   (not-required) options for matching--see documentation for `gsub`; defaults to ""
     
-        :return:    an array of all matches to the first pattern
+        :returns:    an array of all matches to the first pattern
     */
     public func match(pattern: String, _ options: String = "") -> [String]? {
         return RegExp(pattern, options).match(self)
@@ -199,7 +198,7 @@ public extension String {
         :param: pattern the pattern to search against
         :param:   (not-required) options for matching--see documentation for `gsub`; defaults to ""
     
-        :return:    an array of arrays of each matched pattern
+        :returns:    an array of arrays of each matched pattern
     */
     public func scan(pattern: String, _ options: String = "") -> [[String]]? {
         return RegExp(pattern, options).scan(self)
@@ -210,7 +209,7 @@ public extension String {
     
         :param: pattern the pattern to search against
     
-        :return:    an array of the slices
+        :returns:    an array of the slices
     */
     public mutating func slice(pattern: String) -> [[String]]? {
         var matches = self.scan(pattern)
@@ -223,7 +222,7 @@ public extension String {
         
         :param: a string of any characters additional characters to strip off beginning/end of string
         
-        :return: trimmed string
+        :returns: trimmed string
     */
     public func trim(_ characters: String = "") -> String {
         var parsedCharacters = NSRegularExpression.escapedPatternForString(characters)
@@ -235,7 +234,7 @@ public extension String {
         
         :param: a string of any characters additional characters to strip off end of string
         
-        :return: trimmed string
+        :returns: trimmed string
     */
     public func rtrim(_ characters: String = "") -> String {
         var parsedCharacters = NSRegularExpression.escapedPatternForString(characters)
@@ -247,7 +246,7 @@ public extension String {
         
         :param: a string of any characters additional characters to strip off beginning of string
         
-        :return: trimmed string
+        :returns: trimmed string
     */
     public func ltrim(_ characters: String = "") -> String {
         var parsedCharacters = NSRegularExpression.escapedPatternForString(characters)
@@ -255,17 +254,16 @@ public extension String {
     }
 
     /**
-        Attribute matched subpatterns and trim
-    
-        :param: attributes  a dictionary with the pattern as the key and an array of style attributes as values. The following are accepted:
-    
+        Attribute matched subpatterns and trim. The following attributes are permitted:
+
         * UIFont    set the font
         * NSParagraphStyle  set paragraph styling
         * UIColor   set font color
     
+        :param: attributes  a dictionary with the pattern as the key and an array of style attributes as values.
         :param: font    (optional) default font
     
-        :return: an attributed string with styles applied
+        :returns: an attributed string with styles applied
     */
     public func attribute(attributes: [String: [AnyObject]], font: UIFont? = nil) -> NSAttributedString {
         var textAttrs = [TextAttribute]()
@@ -295,7 +293,7 @@ public extension String {
         :param: attributes  an array of TextAttribute objects
         :param: font    default font
     
-        :return: an attributed string with styles applied
+        :returns: an attributed string with styles applied
     */
     public func attribute(attributes: [TextAttribute], font: UIFont? = nil) -> NSAttributedString {
         return RegExp(attributes: attributes).attribute(self, font: font)
@@ -304,7 +302,7 @@ public extension String {
     /**
         Converts Html special characters (e.g. '&#169;' => '©')
     
-        :return:    converted string
+        :returns:    converted string
     */
     public func decodeHtmlSpecialCharacters() -> String {
         var regex = RegExp("&#[a-fA-F\\d]+;")
@@ -325,39 +323,41 @@ public extension String {
     /**
         Helper method that parses an Html string and converts it to an attributed string. Currently the default styles are as follows:
     
-            * p, ul, ol, div, section, main:
+        * p, ul, ol, div, section, main:
 
-                * paragraph style:
-                
-                    * firstLineHeadIndent:  17
-                    * headIndent:   20
-                    * paragraphSpacing: 12
-    
-            * li
-    
-                * paragraph style:
-    
-                    * firstLineHeadIndent:  20
-                    * headIndent:   30
-                    * paragraphSpacing: 7
+            * paragraph style:
+            
+                * firstLineHeadIndent:  17
+                * headIndent:   20
+                * paragraphSpacing: 12
 
-            * b, bold, strong:  boldSystemFontOfSize(12)
-            * i, em:    italicSystemFontOfSize(12)
-            * h1:   boldSystemFontOfSize(24)
-            * h2:   boldSystemFontOfSize(20)
-            * h3:   italicSystemFontOfSize(18)
-            * h4:   boldSystemFontOfSize(16)
-            * h5:   systemFontOfSize(15)
+        * li
 
-        :param: map override default html properties passing in an array of variables which can be either NSParagraphStyle, UIFont, or UIColor variables. For example, to set `p` to 16pt system font with 16pts between paragraphs:
+            * paragraph style:
+
+                * firstLineHeadIndent:  20
+                * headIndent:   30
+                * paragraphSpacing: 7
+
+        * b, bold, strong:  boldSystemFontOfSize(12)
+        * i, em:    italicSystemFontOfSize(12)
+        * h1:   boldSystemFontOfSize(24)
+        * h2:   boldSystemFontOfSize(20)
+        * h3:   italicSystemFontOfSize(18)
+        * h4:   boldSystemFontOfSize(16)
+        * h5:   systemFontOfSize(15)
     
+        To ovverride the defaults do something like this:
+
                 var str = "Hello World"
                 var style = NSParagraphStyle()
                 style.setValue(CGFloat(16), forKey: "paragraphSpacing")
                 var font = UIFont.systemFontOfSize(16)
                 var attrStr = str.attributeHtml(map: ["p": [style, font]])
+
+        :param: map override default html properties passing in an array of variables which can be either NSParagraphStyle, UIFont, or UIColor variables.
     
-        :return:    an attributed strings without html tags
+        :returns:    an attributed strings without html tags
     */
     public func attributeHtml(map: [String:[AnyObject]] = [String:[AnyObject]]()) -> NSAttributedString {
         var str = self.decodeHtmlSpecialCharacters().gsub("\\<.*br>", "\n")
@@ -434,7 +434,7 @@ public extension String {
         
         :param: pattern pattern to match against
         
-        :return:    return the full match or nil, if none exist
+        :returns:    the full match or nil, if none exist
     */
     public subscript(pattern: String) -> String? {
         get {
@@ -452,7 +452,7 @@ public extension String {
         :param: pattern pattern with subpatterns to match against
         :param: index   the subpattern index to retrieve
         
-    :return:    return the subpattern match or nil, if none exist
+    :returns:    return the subpattern match or nil, if none exist
     */
     public subscript(pattern: String, index: Int) -> String? {
         get {
