@@ -9,6 +9,59 @@
 import UIKit
 
 
+private let consonant = "[b-df-hj-np-tv-z]"
+private let vowel = "[aeiou]"
+
+let plurals: [(String, String)] = [
+    ("(?<=f)oo(?=t)$|(?<=t)oo(?=th)$|(?<=g)oo(?=se)$", "ee"),
+    ("(?<=i)fe$|(?<=[eao]l)f$|(?<=(l|sh)ea)f$", "ves"),
+    ("(\\w{2,})[ie]x", "$1ices"),
+    ("(?<=[ml])ouse$", "ice"),
+    ("man$", "men"),
+    ("child$", "children"),
+    ("person$", "people"),
+    ("eau$", "eaux"),
+    ("(?<=-by)$", "s"),
+    ("(?<=[^q]\(vowel)y)$", "s"),
+    ("y$", "ies"),
+    ("(?<=s|sh|tch)$", "es"),
+    ("(?<=\(vowel)\(consonant)i)um", "a"),
+    ("(?<=\\w)$", "s")
+    //"a$": "ae",
+    //"us$": "i"
+    //"us$": "ora",
+    //"us$": "era",
+]
+
+let singulars: [(String, String)] = [
+    ("(?<=f)ee(?=t)$|(?<=t)ee(?=th)$|(?<=g)ee(?=se)$", "oo"),
+    ("(?<=i)ves$", "fe"),
+    ("(?<=[eao]l)ves$|(?<=(l|sh)ea)ves$", "f"),
+    ("(?<=[ml])ice$", "ouse"),
+    ("men$", "man"),
+    ("children$", "child"),
+    ("people$", "person"),
+    ("eaux$", "eau"),
+    ("(?<=-by)s$", ""),
+    ("(?<=[^q]\(vowel)y)s$", ""),
+    ("ies$", "y"),
+    ("(?<=s|sh|tch)es$", ""),
+    ("(?<=\(vowel)\(consonant)i)a", "um"),
+    ("(?<=\\w)s$", "")
+]
+
+private let irregulars: [String:String] = [
+    "potato": "potatoes",
+    "di": "dice",
+    "appendix": "appendices",
+    "index": "indices",
+    "matrix": "matrices",
+    "radix": "radices",
+    "vertex": "vertices",
+    "radius": "radii",
+    "goose": "geese"
+]
+
 infix operator =~ { associativity left precedence 140 }
 
 /**
@@ -36,38 +89,72 @@ public extension String {
         :returns: a date
     */
     public func toDate() -> NSDate? {
-
+        //println("to Date: \(self)")
+        
         var patterns = [
-            "(\\d{4})[-\\/](\\d{1,2})[-\\/](\\d{1,2})": ["year", "month", "day"],
-            "(\\d{1,2})[-\\/](\\d{1,2})[-\\/](\\d{4})": ["year", "month", "day"]
+            "\\w+ (\\w+) (\\d+) (\\d{1,2}):(\\d{1,2}):(\\d{1,2}) \\+\\d{4} (\\d{4})": ["month", "day", "hour", "minute", "second", "year"],
+            "(\\d{4})[-\\/](\\d{1,2})[-\\/](\\d{1,2})(?: (\\d{1,2}):(\\d{1,2}):(\\d{1,2}))?": ["year", "month", "day", "hour", "minute", "second"],
+            "(\\d{1,2})[-\\/](\\d{1,2})[-\\/](\\d{4})(?: (\\d{1,2}):(\\d{1,2}):(\\d{1,2}))?": ["month", "day", "year", "hour", "minute", "second"]
         ]
         
         for (pattern, map) in patterns {
             if let matches = self.match(pattern) {
                 //println("Matches \(matches)")
-                if(matches.count == 4) {
+                if(matches.count >= 4) {
                     var dictionary = [String:String]()
                     
                     for (i, item) in enumerate(map) {
-                        dictionary[item] = matches[i + 1]
+                        if i + 1 < matches.count {
+                            dictionary[item] = matches[i + 1]
+                        } else {
+                            break
+                        }
                     }
                     
                     let calendar = NSCalendar.currentCalendar()
                     let comp = NSDateComponents()
                     
+                    comp.year = 0
                     if let year = dictionary["year"]?.toInt() {
                         comp.year = year
-                        if let month = dictionary["month"]?.toInt() {
+                    }
+                    
+                    comp.month = 0
+                    if let month = dictionary["month"] {
+                        if let month = month.toInt() {
                             comp.month = month
-                            if let day = dictionary["day"]?.toInt() {
-                                comp.day = day
-                                comp.hour = 0
-                                comp.minute = 0
-                                comp.second = 0
-                                return calendar.dateFromComponents(comp)
+                        } else {
+                            var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+                            for (i, m) in enumerate(months) {
+                                if month =~ m {
+                                    comp.month = i
+                                    break
+                                }
                             }
                         }
                     }
+                    
+                    comp.day = 0
+                    if let day = dictionary["day"]?.toInt() {
+                        comp.day = day
+                    }
+                    
+                    comp.hour = 0
+                    if let hour = dictionary["hour"]?.toInt() {
+                        comp.hour = hour
+                    }
+                    
+                    comp.minute = 0
+                    if let minute = dictionary["minute"]?.toInt() {
+                        comp.minute = minute
+                    }
+                    
+                    comp.second = 0
+                    if let second = dictionary["second"]?.toInt() {
+                        comp.second = second
+                    }
+                    
+                    return calendar.dateFromComponents(comp)
                 }
             }
         }
@@ -130,7 +217,7 @@ public extension String {
         var regex = RegExp(pattern, options)
         return regex.gsub(self, callback: callback)
     }
-    
+
     /**
         Convenience wrapper for gsub with options
     */
@@ -252,52 +339,6 @@ public extension String {
         var parsedCharacters = NSRegularExpression.escapedPatternForString(characters)
         return self.gsub("^[\\s\(parsedCharacters)]+", "")
     }
-
-    /**
-        Attribute matched subpatterns and trim. The following attributes are permitted:
-
-        * UIFont    set the font
-        * NSParagraphStyle  set paragraph styling
-        * UIColor   set font color
-    
-        :param: attributes  a dictionary with the pattern as the key and an array of style attributes as values.
-        :param: font    (optional) default font
-    
-        :returns: an attributed string with styles applied
-    */
-    public func attribute(attributes: [String: [AnyObject]], font: UIFont? = nil) -> NSAttributedString {
-        var textAttrs = [TextAttribute]()
-
-        for (pattern, attrs) in attributes {
-            var map = [NSObject: AnyObject]()
-            
-            for attr in attrs {
-                if attr is UIFont {
-                    map[NSFontAttributeName] = attr
-                } else if attr is NSParagraphStyle {
-                    map[NSParagraphStyleAttributeName] = attr
-                } else if attr is UIColor {
-                    map[NSForegroundColorAttributeName] = attr
-                }
-            }
-            
-            textAttrs.append(TextAttribute(pattern: pattern, attribute: map))
-        }
-        
-        return RegExp(attributes: textAttrs).attribute(self, font: font)
-    }
-
-    /**
-        Attribute matched subpatterns and trim
-        
-        :param: attributes  an array of TextAttribute objects
-        :param: font    default font
-    
-        :returns: an attributed string with styles applied
-    */
-    public func attribute(attributes: [TextAttribute], font: UIFont? = nil) -> NSAttributedString {
-        return RegExp(attributes: attributes).attribute(self, font: font)
-    }
     
     /**
         Converts Html special characters (e.g. '&#169;' => '©')
@@ -318,6 +359,161 @@ public extension String {
             println("There was an issue while trying to decode character '\(pattern)'")
             return ""
         }
+    }
+
+    /**
+        Converts a string to camelcase. e.g.: 'hello_world' -> 'HelloWorld'
+    
+        :returns:   a formatted string
+    */
+    public func toCamelcase() -> String {
+        return gsub("[_\\-\\s]\\w") { match in
+            return match[advance(match.startIndex, 1)..<match.endIndex].uppercaseString
+        }
+    }
+
+    /**
+        Converts a string to snakecase. e.g.: 'HelloWorld' -> 'hello_world'
+
+        :param: language (Reserved for future use)
+
+        :returns:   a formatted string
+    */
+    public func toSnakecase() -> String {
+        return gsub("[\\s-]\\w") { match in
+            return "_" + match[advance(match.startIndex, 1)..<match.endIndex].lowercaseString
+        }.gsub("(?<!^)\\p{Lu}") { match in
+            return "_\(match.lowercaseString)"
+        }.lowercaseString
+    }
+
+    /**
+        DEVELOPMENTAL METHOD: Change String from singular to plural.
+    
+        :param: language (Reserved for future use)
+    
+        :returns:   a plural string
+    */
+    public func pluralize(language: String = "en/us") -> String {
+        if let plural = irregulars[self] {
+            return plural
+        }
+        
+        for (regex, mod) in plurals {
+            var replacement = self.gsubi(regex, mod)
+            if replacement != self {
+                return replacement
+            }
+        }
+        
+        return self
+    }
+
+    /**
+        DEVELOPMENTAL METHOD: Change String from plural to singular.
+        
+        :returns:   a singular string
+    */
+    public func singularize(language: String = "en/us") -> String {
+        if let plurals = irregulars.flip(), plural = plurals[self] {
+            return plural
+        }
+        
+        for (regex, mod) in singulars {
+            var replacement = self.gsubi(regex, mod)
+            if replacement != self {
+                return replacement
+            }
+        }
+        
+        return self
+    }
+
+    /**
+        Set the first letter to lowercase
+        
+        :returns:   formatted string
+    */
+    public func decapitalize() -> String {
+        var prefix = self[startIndex..<advance(startIndex, 1)].lowercaseString
+        var body = self[advance(startIndex, 1)..<endIndex]
+        return "\(prefix)\(body)"
+    }
+
+    /**
+        Set the first letter to uppercase
+        
+        :returns:   formatted string
+    */
+    public func capitalize() -> String {
+        var prefix = self[startIndex..<advance(startIndex, 1)].uppercaseString
+        var body = self[advance(startIndex, 1)..<endIndex]
+        return "\(prefix)\(body)"
+    }
+
+    /**
+        Repeat String x times.
+    
+        :param: the number of times to repeat
+    
+        :returns:   formatted string
+    */
+    public func repeat(times: Int) -> String {
+        
+        var rstring = ""
+        if times > 0 {
+            for i in 0...times {
+                rstring = "\(rstring)\(self)"
+            }
+        }
+        return rstring
+    }
+    
+
+    /**
+        Attribute matched subpatterns and trim. The following attributes are permitted:
+        
+        * UIFont    set the font
+        * NSParagraphStyle  set paragraph styling
+        * UIColor   set font color
+        
+        :param: attributes  a dictionary with the pattern as the key and an array of style attributes as values.
+        :param: font    (optional) default font
+        
+        :returns: an attributed string with styles applied
+    */
+    public func attribute(attributes: [String: [AnyObject]], font: UIFont? = nil) -> NSAttributedString {
+        var textAttrs = [TextAttribute]()
+        
+        for (pattern, attrs) in attributes {
+            var map = [NSObject: AnyObject]()
+            
+            for attr in attrs {
+                if attr is UIFont {
+                    map[NSFontAttributeName] = attr
+                } else if attr is NSParagraphStyle {
+                    map[NSParagraphStyleAttributeName] = attr
+                } else if attr is UIColor {
+                    map[NSForegroundColorAttributeName] = attr
+                }
+            }
+            
+            textAttrs.append(TextAttribute(pattern: pattern, attribute: map))
+        }
+        
+        return RegExp(attributes: textAttrs).attribute(self, font: font)
+    }
+    
+    /**
+        Attribute matched subpatterns and trim
+        
+        :param: attributes  an array of TextAttribute objects
+        :param: font    default font
+        
+        :returns: an attributed string with styles applied
+    */
+    public func attribute(attributes: [TextAttribute], font: UIFont? = nil) -> NSAttributedString {
+        return RegExp(attributes: attributes).attribute(self, font: font)
     }
 
     /**
@@ -427,46 +623,6 @@ public extension String {
         let capacity = Swift.count(self.utf16)
         return NSMakeRange(0, capacity)
     }
-
-    /*
-    /**
-        Convenience subscript operator for accessing the full pattern match
-        
-        :param: pattern pattern to match against
-        
-        :returns:    the full match or nil, if none exist
-    */
-    public subscript(pattern: String) -> String? {
-        get {
-            if let matches = match(pattern) {
-            return matches[0]
-        }
-        
-        return nil
-        }
-    }
-    
-    /**
-    Convenience subscript operator for accessing a particular subpattern match
-    
-        :param: pattern pattern with subpatterns to match against
-        :param: index   the subpattern index to retrieve
-        
-    :returns:    return the subpattern match or nil, if none exist
-    */
-    public subscript(pattern: String, index: Int) -> String? {
-        get {
-            if let matches = self.match(pattern) {
-                if matches.count > index && index >= 0 {
-                    return matches[index]
-                }
-            }
-        
-            return nil
-        }
-    }
-    */
-
 }
 
 internal extension NSMutableString {
@@ -488,11 +644,35 @@ internal extension NSMutableAttributedString {
 
 internal extension NSRange {
     internal func toStringIndexRange(input: String) -> Range<String.Index> {
-        //println("\(location + length), \(input.utf16Count)")
-        var startIndex = advance(input.startIndex, location)
-        var endIndex = advance(input.startIndex, location + length)
-        var range = Range(start: startIndex, end: endIndex)
-        //println(input.substringWithRange(range))
-        return range
+        if location < count(input.utf16) {
+            var startIndex = advance(input.startIndex, location)
+            var endIndex = advance(input.startIndex, location + length)
+            var range = Range(start: startIndex, end: endIndex)
+            //println(input.substringWithRange(range))
+            return range
+        }
+        
+        //println("Count: \(count(input.utf16))")
+        //println("Location: \(location)")
+        return Range(start: input.startIndex, end: input.endIndex)
+    }
+}
+
+internal extension Dictionary {
+    
+    internal func flip() -> Dictionary<Key, Value>? {
+        if Key.self is Value.Type {
+            var out = Dictionary<Key, Value>()
+            
+            for key in self.keys {
+                if let value = self[key] as? Key, key = key as? Value {
+                    out[value] = key
+                }
+            }
+            
+            return out.count > 0 ? out : nil
+        }
+        
+        return nil
     }
 }

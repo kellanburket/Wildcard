@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Wildcard"
-  s.version          = "1.0.5"
+  s.version          = "1.0.6"
   s.summary          = "A RegEx framework for Swift"
   s.description      = <<-DESC
         Wildcard is a Swift RegEx(Regular Expressions) framework. It includes common utility methods for parsing and manipulating strings based on Ruby, Perl, and PHP's core string libraries as well as a Perl-style matching operator `string =~ pattern`.
@@ -23,15 +23,11 @@ Pod::Spec.new do |s|
   s.source           = { :git => "https://github.com/kellanburket/Wildcard.git", :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.platform     = :ios, '8.0'
+  s.platform     = :ios, '8.3'
   s.requires_arc = true
 
   s.source_files = 'Pod/Classes/**/*'
   s.resource_bundles = {
     'Wildcard' => ['Pod/Assets/*.png']
   }
-
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
 end

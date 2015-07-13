@@ -40,6 +40,52 @@ class Tests: XCTestCase {
         var testCase = "a".split(";")
         XCTAssert(testCase.count == 1 && testCase[0] == "a", "\(testCase)")
     }
+
+    func testStringFormatting() {
+        var testString = "Hello World"
+
+        var testCase = testString.toSnakecase()
+        XCTAssertEqual(testCase, "hello_world", "\(testCase)")
+    
+        testCase = testString.toCamelcase()
+        XCTAssertEqual(testCase, "HelloWorld", "\(testCase)")
+
+        testString = testCase
+        testCase = testString.decapitalize()
+        XCTAssertEqual(testCase, "helloWorld", "\(testCase)")
+
+        testString = testCase
+        testCase = testString.capitalize()
+        XCTAssertEqual(testCase, "HelloWorld", "\(testCase)")
+    }
+    
+    func testStringPlurals() {
+        var testStrings = [
+            "world": "worlds",
+            "grass": "grasses",
+            "fieldmouse": "fieldmice",
+            "radix": "radices",
+            "woman": "women",
+            "child": "children",
+            "buy": "buys",
+            "pony": "ponies",
+            "goose": "geese",
+            "stand-by": "stand-bys",
+            "di": "dice",
+            "slice": "slices"
+        ]
+
+        for (testString, targetString) in testStrings {
+            var testCase = testString.pluralize()
+            XCTAssertEqual(testCase, targetString, "\(testCase)")
+            
+            var test = targetString
+            var target = testString
+ 
+            testCase = test.singularize()
+            XCTAssertEqual(testCase, target, "\(testCase)")
+        }
+    }
     
     func testStringSub() {
         println("Testing String.gsub")
