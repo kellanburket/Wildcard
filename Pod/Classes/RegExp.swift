@@ -16,8 +16,8 @@ public class RegExp {
     private var pattern: String = ""
     private var attributes = [TextAttribute]()
     private var replacement: String = ""
-    private var options: NSRegularExpressionOptions = NSRegularExpressionOptions.allZeros
-    private var mOptions: NSMatchingOptions = NSMatchingOptions.allZeros
+    private var options: UInt = 0
+    private var mOptions: UInt = 0
     private var regExp: NSRegularExpression?
 
     /**
@@ -31,8 +31,8 @@ public class RegExp {
         * c:    ignore metacharacters when matching (e.g, `\w`, `\d`, `\s`, etc..)
         * l:    use only `\n` as a line separator
     
-        :param: pattern an ICU-style regular expression
-        :param: options a string containing option flags
+        - parameter pattern: an ICU-style regular expression
+        - parameter options: a string containing option flags
     
     */
     public init(_ pattern: String, _ options: String = "") {
@@ -55,17 +55,17 @@ public class RegExp {
     /**
         Counts the number of matches in a string
         
-        :param: input   an input string
+        - parameter input:   an input string
     
-        :returns:    the number of matches in the input string
+        - returns:    the number of matches in the input string
     */
     public func count(input: String) -> Int? {
-        var capacity = Swift.count(input.utf16)
+        let capacity = input.utf16.count
         
         if let regExp = doRegExp() {
             return regExp.numberOfMatchesInString(
                 input,
-                options: mOptions,
+                options: NSMatchingOptions(rawValue: mOptions),
                 range: NSMakeRange(
                     0,
                     capacity
@@ -79,9 +79,9 @@ public class RegExp {
     /**
         Looks for the first ICU-style pattern match in the input string
     
-        :param: input   an input string
+        - parameter input:   an input string
         
-        :returns:    an array of matches or nil
+        - returns:    an array of matches or nil
     */
     public func match(var input: String) -> [String]? {
         input = input.stringByReplacingOccurrencesOfString("\n", withString: "\\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
@@ -90,11 +90,11 @@ public class RegExp {
         
         getFirstMatch(input) { result in
 
-            var numRanges = result.numberOfRanges
+            let numRanges = result.numberOfRanges
             
             for i in 0..<numRanges {
-                var range = result.rangeAtIndex(i)
-                var match = input.substringWithRange(range.toStringIndexRange(input))
+                let range = result.rangeAtIndex(i)
+                let match = input.substringWithRange(range.toStringIndexRange(input))
                 matches.append(match)
             }
         }
@@ -108,9 +108,9 @@ public class RegExp {
     /**
         Looks for all ICU-style pattern matches in the input string
         
-        :param: input   an input string
+        - parameter input:   an input string
         
-        :returns:    an array of an array of matches or nil
+        - returns:    an array of an array of matches or nil
     */
     public func scan(var input: String) -> [[String]]? {
         input = input.stringByReplacingOccurrencesOfString("\n", withString: "\\n", options: NSStringCompareOptions.LiteralSearch, range: nil)
@@ -123,11 +123,11 @@ public class RegExp {
                 matches.append([String]())
             }
             
-            var numRanges = result.numberOfRanges
+            let numRanges = result.numberOfRanges
             
             for i in 0..<numRanges {
-                var range = result.rangeAtIndex(i)
-                var match = input.substringWithRange(range.toStringIndexRange(input))
+                let range = result.rangeAtIndex(i)
+                let match = input.substringWithRange(range.toStringIndexRange(input))
                 matches[index].append(match)
             }
         }
@@ -140,15 +140,18 @@ public class RegExp {
     
     private func getAllMatches(input: String, reverse: Bool,  onMatch: (NSTextCheckingResult, Int) -> Void) {
         if let regExp = doRegExp() {
-            if var results = regExp.matchesInString(input, options: mOptions, range: input.toRange()) as? [NSTextCheckingResult] {
+            var results = regExp.matchesInString(
+                input,
+                options: NSMatchingOptions(rawValue: mOptions),
+                range: input.toRange()
+            )
+            
+            if reverse {
+                results = Array(results.reverse())
+            }
                 
-                if reverse {
-                    results = results.reverse()
-                }
-                
-                for (i, result) in enumerate(results) {
-                    onMatch(result, i)
-                }
+            for (i, result) in results.enumerate() {
+                onMatch(result, i)
             }
         }
     }
@@ -158,10 +161,14 @@ public class RegExp {
             
             let range = makeRange(input)
             
-            if var results = regExp.matchesInString(input, options: mOptions, range: range) as? [NSTextCheckingResult] {
-                if results.count > 0 {
-                    onMatch(results[0])
-                }
+            var results = regExp.matchesInString(
+                input,
+                options: NSMatchingOptions(rawValue: mOptions),
+                range: range
+            )
+
+            if results.count > 0 {
+                onMatch(results[0])
             }
         }
     }
@@ -182,10 +189,10 @@ public class RegExp {
     /**
         Substitute all matches in input string with replacement string
         
-        :param: input   an input string
-        :param: replacement replacement string (supports back references)
+        - parameter input:   an input string
+        - parameter replacement: replacement string (supports back references)
     
-        :returns:    the modified input string
+        - returns:    the modified input string
     */
     public func gsub(string: String, _ replacement: String) -> String {
         return gsub(string.toMutable(), replacement) as String
@@ -196,7 +203,7 @@ public class RegExp {
         if let regExp = doRegExp() {
             regExp.replaceMatchesInString(
                 mutable,
-                options: mOptions,
+                options: NSMatchingOptions(rawValue: mOptions),
                 range: NSMakeRange(0, mutable.length),
                 withTemplate: self.replacement
             )
@@ -207,10 +214,10 @@ public class RegExp {
     /**
         Substitute all matches in input string with return value of callback function
         
-        :param: input   an input string
-        :param: callback    a callback function that takes a match as an argument and returns a modified string (does not support back references)
+        - parameter input:   an input string
+        - parameter callback:    a callback function that takes a match as an argument and returns a modified string (does not support back references)
         
-        :returns:    the modified input string
+        - returns:    the modified input string
     */
     public func gsub(string: String, callback: ((String) -> (String))) -> String {
         return gsub(string.toMutable(), callback: callback) as String
@@ -234,28 +241,28 @@ public class RegExp {
     /**
         Substitute the first matches in input string with replacement string
         
-        :param: input   an input string
-        :param: replacement replacement string (supports back references)
+        - parameter input:   an input string
+        - parameter replacement: replacement string (supports back references)
         
-        :returns:    the modified input string
+        - returns:    the modified input string
     */
     public func sub(string: String, _ replacement: String) -> String {
-        var mutable = string.toMutable()
+        let mutable = string.toMutable()
         
         getFirstMatch(string) { result in
             if let regExp = self.regExp {
-                let numRanges = result.numberOfRanges
                 
-                var substitute = regExp.replacementStringForResult(
+                let substitute = regExp.replacementStringForResult(
                     result,
                     inString: string,
                     offset: 0,
                     template: replacement
                 )
                 
-                let range = result.rangeAtIndex(0)
-                let substring = mutable.substringWithRange(range)
-                mutable.replaceCharactersInRange(range, withString: substitute)
+                mutable.replaceCharactersInRange(
+                    result.rangeAtIndex(0),
+                    withString: substitute
+                )
             }
         }
         
@@ -266,17 +273,15 @@ public class RegExp {
     /**
         Apply text attribution to an input string
     
-        :param: input   an input string
-        :param: font    set the default font
+        - parameter input:   an input string
+        - parameter font:    set the default font
     
-        :returns:    A mutable attributed string
+        - returns:    A mutable attributed string
     */
     public func attribute(var input: String, font: UIFont? = nil) -> NSMutableAttributedString {
         removeLinebreaks(&input)
-        
-        var capacity = Swift.count(input.utf16)
-        
-        var attributedText = NSMutableAttributedString(string: input)
+
+        let attributedText = NSMutableAttributedString(string: input)
         
         attributedText.addAttribute(
             NSFontAttributeName,
@@ -294,10 +299,10 @@ public class RegExp {
             }
         }
         
-        var matches = TextAttribute.nest(attributes)
+        let matches = TextAttribute.nest(attributes)
         
         for match in matches {
-            if var string = attributedText.attributedSubstringFromRange(match.subrange).mutableCopy() as? NSMutableAttributedString {
+            if let string = attributedText.attributedSubstringFromRange(match.subrange).mutableCopy() as? NSMutableAttributedString {
                 
                 var replacement = RegExp(pattern).gsub(string, "$1")
                 
@@ -313,7 +318,7 @@ public class RegExp {
     
     //Utility functions for finding substring ranges
     private func makeRange(input: String) -> NSRange {
-        var capacity = Swift.count(input.utf16)
+        let capacity = input.utf16.count
         return NSMakeRange(0, capacity)
     }
 
@@ -322,24 +327,23 @@ public class RegExp {
     }
     
     internal func getSubstringRanges(input: String) -> [RegExpMatch]? {
-        var capacity = Swift.count(input.utf16)
         var matches = [RegExpMatch]()
         
         getMatches(input) { result, index in
-            var numRanges = result.numberOfRanges
-            var matchRange = result.rangeAtIndex(0)
-            var match = input.substringWithNSRange(matchRange)
+            let numRanges = result.numberOfRanges
+            let matchRange = result.rangeAtIndex(0)
+            let match = input.substringWithNSRange(matchRange)
             
-            var regExpMatch: MatchTuple = (match, matchRange)
+            let regExpMatch: MatchTuple = (match, matchRange)
             var regExpSubmatches: [MatchTuple] = [MatchTuple]()
             
             for i in 1..<numRanges {
-                var submatchRange = result.rangeAtIndex(i)
-                var submatch = input.substringWithNSRange(submatchRange)
+                let submatchRange = result.rangeAtIndex(i)
+                let submatch = input.substringWithNSRange(submatchRange)
                 regExpSubmatches.append((submatch, submatchRange))
             }
             
-            var nextMatch = RegExpMatch(
+            let nextMatch = RegExpMatch(
                 pattern: self.pattern,
                 match: regExpMatch,
                 submatches: regExpSubmatches
@@ -356,8 +360,7 @@ public class RegExp {
     }
     
     ///TODO: Find out what these do and use them or don't
-    private func setMatchingOptions(flags: String) -> NSMatchingOptions {
-        var options = NSMatchingOptions.allZeros
+    private func setMatchingOptions(flags: String) -> UInt {
         /*
         NSMatchingOptions.ReportProgress
         NSMatchingOptions.ReportCompletion
@@ -365,31 +368,31 @@ public class RegExp {
         NSMatchingOptions.WithTransparentBounds
         NSMatchingOptions.WithoutAnchoringBounds
         */
-        self.mOptions = options
-        return options;
+        mOptions = UInt(0)
+        return mOptions
     }
     
-    private func setOptions(flags: String) -> NSRegularExpressionOptions {
-        var options: NSRegularExpressionOptions = NSRegularExpressionOptions.allZeros
+    private func setOptions(flags: String) -> UInt {
+        var options: UInt = 0
         
-        for character in flags {
+        for character in flags.characters {
             switch(character) {
             case("i"):
-                options |= NSRegularExpressionOptions.CaseInsensitive
+                options |= NSRegularExpressionOptions.CaseInsensitive.rawValue
             case("x"):
-                options |= NSRegularExpressionOptions.AllowCommentsAndWhitespace
+                options |= NSRegularExpressionOptions.AllowCommentsAndWhitespace.rawValue
             case("s"):
-                options |= NSRegularExpressionOptions.DotMatchesLineSeparators
+                options |= NSRegularExpressionOptions.DotMatchesLineSeparators.rawValue
             case("m"):
-                options |= NSRegularExpressionOptions.AnchorsMatchLines
+                options |= NSRegularExpressionOptions.AnchorsMatchLines.rawValue
             case("w"):
-                options |= NSRegularExpressionOptions.UseUnicodeWordBoundaries
+                options |= NSRegularExpressionOptions.UseUnicodeWordBoundaries.rawValue
             case("c"):
-                options |= NSRegularExpressionOptions.IgnoreMetacharacters
+                options |= NSRegularExpressionOptions.IgnoreMetacharacters.rawValue
             case("l"):
-                options |= NSRegularExpressionOptions.UseUnixLineSeparators
+                options |= NSRegularExpressionOptions.UseUnixLineSeparators.rawValue
             default:
-                options |= NSRegularExpressionOptions.allZeros
+                options |= 0
             }
         }
         
@@ -406,14 +409,18 @@ public class RegExp {
         
         var error: NSError?
         
-        regExp = NSRegularExpression(
-            pattern: pattern,
-            options: options,
-            error: &error
-        )
+        do {
+            regExp = try NSRegularExpression(
+                pattern: pattern,
+                options: NSRegularExpressionOptions(rawValue: options)
+            )
+        } catch let error1 as NSError {
+            error = error1
+            regExp = nil
+        }
 
-        if let e = error {
-            println("!!Error: There was an problem matching `\(pattern)`: \(error)")
+        if error != nil {
+            print("!!Error: There was an problem matching `\(pattern)`: \(error)")
             return nil
         } else {
             return regExp

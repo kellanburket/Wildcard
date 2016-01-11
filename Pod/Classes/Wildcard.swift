@@ -67,10 +67,10 @@ infix operator =~ { associativity left precedence 140 }
 /**
     Checks if the input matches the pattern
 
-    :param: left   the input string
-    :param: right    the pattern
+    - parameter left:   the input string
+    - parameter right:    the pattern
 
-    :returns:    returns true if pattern exists in the input string
+    - returns:    returns true if pattern exists in the input string
 */
 public func =~(left: String, right: String) -> Bool {
     return left.match(right) != nil
@@ -79,31 +79,40 @@ public func =~(left: String, right: String) -> Bool {
 public extension String {
     
     /**
-        Convert a string into an NSDate object. Currently supports both backslashes and hyphens in the following formats:
+        Convert a string into an NSDate object. 
+        Currently supports both backslashes and hyphens in the following formats:
         
         * Y-m-d
         * m-d-Y
         * Y-n-j
         * n-j-Y
         
-        :returns: a date
+        - returns: a date
     */
     public func toDate() -> NSDate? {
         //println("to Date: \(self)")
         
-        var patterns = [
-            "\\w+ (\\w+) (\\d+) (\\d{1,2}):(\\d{1,2}):(\\d{1,2}) \\+\\d{4} (\\d{4})": ["month", "day", "hour", "minute", "second", "year"],
-            "(\\d{4})[-\\/](\\d{1,2})[-\\/](\\d{1,2})(?: (\\d{1,2}):(\\d{1,2}):(\\d{1,2}))?": ["year", "month", "day", "hour", "minute", "second"],
-            "(\\d{1,2})[-\\/](\\d{1,2})[-\\/](\\d{4})(?: (\\d{1,2}):(\\d{1,2}):(\\d{1,2}))?": ["month", "day", "year", "hour", "minute", "second"]
+        let patterns = [
+            "\\w+ (\\w+) (\\d+) (\\d{1,2}):(\\d{1,2}):(\\d{1,2}) \\+\\d{4} (\\d{4})": [
+                "month", "day", "hour", "minute", "second", "year"
+            ],
+            "(\\d{4})[-\\/](\\d{1,2})[-\\/](\\d{1,2})(?: (\\d{1,2}):(\\d{1,2}):(\\d{1,2}))?": [
+                "year", "month", "day", "hour", "minute", "second"
+            ],
+            "(\\d{1,2})[-\\/](\\d{1,2})[-\\/](\\d{4})(?: (\\d{1,2}):(\\d{1,2}):(\\d{1,2}))?": [
+                "month", "day", "year", "hour", "minute", "second"
+            ]
         ]
-        
+
+        let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
         for (pattern, map) in patterns {
             if let matches = self.match(pattern) {
                 //println("Matches \(matches)")
                 if(matches.count >= 4) {
                     var dictionary = [String:String]()
                     
-                    for (i, item) in enumerate(map) {
+                    for (i, item) in map.enumerate() {
                         if i + 1 < matches.count {
                             dictionary[item] = matches[i + 1]
                         } else {
@@ -115,17 +124,18 @@ public extension String {
                     let comp = NSDateComponents()
                     
                     comp.year = 0
-                    if let year = dictionary["year"]?.toInt() {
+                    if let year_string = dictionary["year"],
+                        year = Int(year_string)
+                    {
                         comp.year = year
                     }
                     
                     comp.month = 0
                     if let month = dictionary["month"] {
-                        if let month = month.toInt() {
+                        if let month = Int(month) {
                             comp.month = month
                         } else {
-                            var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-                            for (i, m) in enumerate(months) {
+                            for (i, m) in months.enumerate() {
                                 if month =~ m {
                                     comp.month = i
                                     break
@@ -135,22 +145,22 @@ public extension String {
                     }
                     
                     comp.day = 0
-                    if let day = dictionary["day"]?.toInt() {
+                    if let day_string = dictionary["day"], day = Int(day_string) {
                         comp.day = day
                     }
                     
                     comp.hour = 0
-                    if let hour = dictionary["hour"]?.toInt() {
+                    if let hour_string = dictionary["hour"], hour = Int(hour_string) {
                         comp.hour = hour
                     }
                     
                     comp.minute = 0
-                    if let minute = dictionary["minute"]?.toInt() {
+                    if let minute_string = dictionary["minute"], minute = Int(minute_string) {
                         comp.minute = minute
                     }
                     
                     comp.second = 0
-                    if let second = dictionary["second"]?.toInt() {
+                    if let second_string = dictionary["second"], second = Int(second_string) {
                         comp.second = second
                     }
                     
@@ -164,12 +174,13 @@ public extension String {
     /**
         Split a string into an array of strings by slicing at delimiter
     
-        :param: delimiter   character(s) to split string at
+        - parameter delimiter:   character(s) to split string at
 
-        :returns: an array of strings if delimiter matches, or an array with the original string as its only component
+        - returns:  an array of strings if delimiter matches, or an array
+                    with the original string as its only component
     */
     public func split(delimiter: String) -> [String] {
-        var parsedDelimiter: String = NSRegularExpression.escapedPatternForString(delimiter)
+        let parsedDelimiter: String = NSRegularExpression.escapedPatternForString(delimiter)
         
         if let matches = self.scan("(.+?)(?:\(parsedDelimiter)|$)") {
             var arr = [String]()
@@ -186,18 +197,19 @@ public extension String {
     /**
         Substitute result of callback function for all occurences of pattern
 
-        :param: pattern a regular expression string to match against
-        :param: callback    a callback function to call on pattern match success
+        - parameter pattern: a regular expression string to match against
+        - parameter callback:    a callback function to call on pattern match success
         
-        :returns:    modified string
+        - returns:    modified string
     */
     public func gsub(pattern: String, callback: ((String) -> (String))) -> String {
-        var regex = RegExp(pattern)
+        let regex = RegExp(pattern)
         return regex.gsub(self, callback: callback)
     }
     
     /**
-        Substitute result of callback function for all occurences of pattern. The following flags are permitted:
+        Substitute result of callback function for all occurences of pattern. 
+        The following flags are permitted:
 
         * i:    case-insenstive match
         * x:    ignore #-prefixed comments and whitespace in this pattern
@@ -207,14 +219,14 @@ public extension String {
         * c:    ignore metacharacters when matching (e.g, `\w`, `\d`, `\s`, etc..)
         * l:    use only `\n` as a line separator
     
-        :param: pattern an ICU-style regular expression
-        :param: options a string containing option flags
-        :param: callback    a callback function to call on pattern match success
+        - parameter pattern: an ICU-style regular expression
+        - parameter options: a string containing option flags
+        - parameter callback:    a callback function to call on pattern match success
         
-        :returns:    modified string
+        - returns:    modified string
     */
     public func gsub(pattern: String, options: String, callback: ((String) -> (String))) -> String {
-        var regex = RegExp(pattern, options)
+        let regex = RegExp(pattern, options)
         return regex.gsub(self, callback: callback)
     }
 
@@ -222,7 +234,7 @@ public extension String {
         Convenience wrapper for gsub with options
     */
     public func gsub(pattern: String, _ replacement: String, options: String = "") -> String {
-        var regex = RegExp(pattern, options)
+        let regex = RegExp(pattern, options)
         return regex.gsub(self, replacement)
     }
 
@@ -230,7 +242,7 @@ public extension String {
         Convenience wrapper for case-insenstive gsub
     */
     public func gsubi(pattern: String, _ replacement: String, options: String = "") -> String {
-        var regex = RegExp(pattern,  "\(options)i")
+        let regex = RegExp(pattern,  "\(options)i")
         return regex.gsub(self, replacement)
     }
 
@@ -238,7 +250,7 @@ public extension String {
         Convenience wrapper for case-insensitive gsub with callback
     */
     public func gsubi(pattern: String, callback: ((String) -> (String))) -> String {
-        var regex = RegExp(pattern, "i")
+        let regex = RegExp(pattern, "i")
         return regex.gsub(self, callback: callback)
     }
     
@@ -246,7 +258,7 @@ public extension String {
         Convenience wrapper for case-insensitive gsub with callback and options
     */
     public func gsubi(pattern: String, options: String, callback: ((String) -> (String))) -> String {
-        var regex = RegExp(pattern, "\(options)i")
+        let regex = RegExp(pattern, "\(options)i")
         return regex.gsub(self, callback: callback)
     }
     
@@ -255,7 +267,7 @@ public extension String {
         Conveneience wrapper for first-match-only substitution
     */
     public func sub(pattern: String, _ replacement: String, options: String = "") -> String {
-        var regex = RegExp(pattern, options)
+        let regex = RegExp(pattern, options)
         return regex.sub(self, replacement)
     }
     
@@ -263,17 +275,17 @@ public extension String {
         Conveneience wrapper for case-insensitive first-match-only substitution
     */
     public func subi(pattern: String, _ replacement: String, options: String = "") -> String {
-        var regex = RegExp(pattern, "\(options)i")
+        let regex = RegExp(pattern, "\(options)i")
         return regex.sub(self, replacement)
     }
     
     /**
         Scans and matches only the first pattern
 
-        :param: pattern the pattern to search against
-        :param:   (not-required) options for matching--see documentation for `gsub`; defaults to ""
+        - parameter pattern: the pattern to search against
+        - parameter   (not-required): options for matching--see documentation for `gsub`; defaults to ""
     
-        :returns:    an array of all matches to the first pattern
+        - returns:    an array of all matches to the first pattern
     */
     public func match(pattern: String, _ options: String = "") -> [String]? {
         return RegExp(pattern, options).match(self)
@@ -282,10 +294,10 @@ public extension String {
     /**
         Scans and matches all patterns
 
-        :param: pattern the pattern to search against
-        :param:   (not-required) options for matching--see documentation for `gsub`; defaults to ""
+        - parameter pattern: the pattern to search against
+        - parameter   (not-required): options for matching--see documentation for `gsub`; defaults to ""
     
-        :returns:    an array of arrays of each matched pattern
+        - returns:    an array of arrays of each matched pattern
     */
     public func scan(pattern: String, _ options: String = "") -> [[String]]? {
         return RegExp(pattern, options).scan(self)
@@ -294,12 +306,12 @@ public extension String {
     /**
         Slices out the parts of the string that match the pattern
     
-        :param: pattern the pattern to search against
+        - parameter pattern: the pattern to search against
     
-        :returns:    an array of the slices
+        - returns:    an array of the slices
     */
     public mutating func slice(pattern: String) -> [[String]]? {
-        var matches = self.scan(pattern)
+        let matches = self.scan(pattern)
         self = self.gsub(pattern, "")
         return matches
     }
@@ -307,56 +319,56 @@ public extension String {
     /**
         Strip white space or aditional specified characters from beginning or end of string
         
-        :param: a string of any characters additional characters to strip off beginning/end of string
+        - parameter a: string of any characters additional characters to strip off beginning/end of string
         
-        :returns: trimmed string
+        - returns: trimmed string
     */
-    public func trim(_ characters: String = "") -> String {
-        var parsedCharacters = NSRegularExpression.escapedPatternForString(characters)
+    public func trim(characters: String = "") -> String {
+        let parsedCharacters = NSRegularExpression.escapedPatternForString(characters)
         return self.gsub("^[\\s\(parsedCharacters)]+|[\\s\(parsedCharacters)]+$", "")
     }
 
     /**
         Strip white space or aditional specified characters from end of string
         
-        :param: a string of any characters additional characters to strip off end of string
+        - parameter a: string of any characters additional characters to strip off end of string
         
-        :returns: trimmed string
+        - returns: trimmed string
     */
-    public func rtrim(_ characters: String = "") -> String {
-        var parsedCharacters = NSRegularExpression.escapedPatternForString(characters)
+    public func rtrim(characters: String = "") -> String {
+        let parsedCharacters = NSRegularExpression.escapedPatternForString(characters)
         return self.gsub("[\\s\(parsedCharacters)]+$", "")
     }
 
     /**
         Strip white space or aditional specified characters from beginning of string
         
-        :param: a string of any characters additional characters to strip off beginning of string
+        - parameter a: string of any characters additional characters to strip off beginning of string
         
-        :returns: trimmed string
+        - returns: trimmed string
     */
-    public func ltrim(_ characters: String = "") -> String {
-        var parsedCharacters = NSRegularExpression.escapedPatternForString(characters)
+    public func ltrim(characters: String = "") -> String {
+        let parsedCharacters = NSRegularExpression.escapedPatternForString(characters)
         return self.gsub("^[\\s\(parsedCharacters)]+", "")
     }
     
     /**
         Converts Html special characters (e.g. '&#169;' => '©')
     
-        :returns:    converted string
+        - returns:    converted string
     */
     public func decodeHtmlSpecialCharacters() -> String {
-        var regex = RegExp("&#[a-fA-F\\d]+;")
+        let regex = RegExp("&#[a-fA-F\\d]+;")
         
         return regex.gsub(self) { pattern in
-            var hex = RegExp("[a-fA-F\\d]+")
+            let hex = RegExp("[a-fA-F\\d]+")
             if let matches = hex.match(pattern) {
-                if let sint = matches[0].toInt() {
-                    var character = Character(UnicodeScalar(UInt32(sint)))
+                if let sint = Int(matches[0]) {
+                    let character = Character(UnicodeScalar(UInt32(sint)))
                     return "\(character)"
                 }
             }
-            println("There was an issue while trying to decode character '\(pattern)'")
+            print("There was an issue while trying to decode character '\(pattern)'")
             return ""
         }
     }
@@ -364,24 +376,24 @@ public extension String {
     /**
         Converts a string to camelcase. e.g.: 'hello_world' -> 'HelloWorld'
     
-        :returns:   a formatted string
+        - returns:   a formatted string
     */
     public func toCamelcase() -> String {
         return gsub("[_\\-\\s]\\w") { match in
-            return match[advance(match.startIndex, 1)..<match.endIndex].uppercaseString
+            return match[match.startIndex.advancedBy(1)..<match.endIndex].uppercaseString
         }
     }
 
     /**
         Converts a string to snakecase. e.g.: 'HelloWorld' -> 'hello_world'
 
-        :param: language (Reserved for future use)
+        - parameter language: (Reserved for future use)
 
-        :returns:   a formatted string
+        - returns:   a formatted string
     */
     public func toSnakecase() -> String {
         return gsub("[\\s-]\\w") { match in
-            return "_" + match[advance(match.startIndex, 1)..<match.endIndex].lowercaseString
+            return "_" + match[match.startIndex.advancedBy(1)..<match.endIndex].lowercaseString
         }.gsub("(?<!^)\\p{Lu}") { match in
             return "_\(match.lowercaseString)"
         }.lowercaseString
@@ -390,9 +402,9 @@ public extension String {
     /**
         DEVELOPMENTAL METHOD: Change String from singular to plural.
     
-        :param: language (Reserved for future use)
+        - parameter language: (Reserved for future use)
     
-        :returns:   a plural string
+        - returns:   a plural string
     */
     public func pluralize(language: String = "en/us") -> String {
         if let plural = irregulars[self] {
@@ -400,7 +412,7 @@ public extension String {
         }
         
         for (regex, mod) in plurals {
-            var replacement = self.gsubi(regex, mod)
+            let replacement = self.gsubi(regex, mod)
             if replacement != self {
                 return replacement
             }
@@ -412,7 +424,7 @@ public extension String {
     /**
         DEVELOPMENTAL METHOD: Change String from plural to singular.
         
-        :returns:   a singular string
+        - returns:   a singular string
     */
     public func singularize(language: String = "en/us") -> String {
         if let plurals = irregulars.flip(), plural = plurals[self] {
@@ -420,7 +432,7 @@ public extension String {
         }
         
         for (regex, mod) in singulars {
-            var replacement = self.gsubi(regex, mod)
+            let replacement = self.gsubi(regex, mod)
             if replacement != self {
                 return replacement
             }
@@ -432,37 +444,37 @@ public extension String {
     /**
         Set the first letter to lowercase
         
-        :returns:   formatted string
+        - returns:   formatted string
     */
     public func decapitalize() -> String {
-        var prefix = self[startIndex..<advance(startIndex, 1)].lowercaseString
-        var body = self[advance(startIndex, 1)..<endIndex]
+        let prefix = self[startIndex..<startIndex.advancedBy(1)].lowercaseString
+        let body = self[startIndex.advancedBy(1)..<endIndex]
         return "\(prefix)\(body)"
     }
 
     /**
         Set the first letter to uppercase
         
-        :returns:   formatted string
+        - returns:   formatted string
     */
     public func capitalize() -> String {
-        var prefix = self[startIndex..<advance(startIndex, 1)].uppercaseString
-        var body = self[advance(startIndex, 1)..<endIndex]
+        let prefix = self[startIndex..<startIndex.advancedBy(1)].uppercaseString
+        let body = self[startIndex.advancedBy(1)..<endIndex]
         return "\(prefix)\(body)"
     }
 
     /**
         Repeat String x times.
     
-        :param: the number of times to repeat
+        - parameter the: number of times to repeat
     
-        :returns:   formatted string
+        - returns:   formatted string
     */
-    public func repeat(times: Int) -> String {
+    public func `repeat`(times: Int) -> String {
         
         var rstring = ""
         if times > 0 {
-            for i in 0...times {
+            for _ in 0...times {
                 rstring = "\(rstring)\(self)"
             }
         }
@@ -477,10 +489,10 @@ public extension String {
         * NSParagraphStyle  set paragraph styling
         * UIColor   set font color
         
-        :param: attributes  a dictionary with the pattern as the key and an array of style attributes as values.
-        :param: font    (optional) default font
+        - parameter attributes:  a dictionary with the pattern as the key and an array of style attributes as values.
+        - parameter font:    (optional) default font
         
-        :returns: an attributed string with styles applied
+        - returns: an attributed string with styles applied
     */
     public func attribute(attributes: [String: [AnyObject]], font: UIFont? = nil) -> NSAttributedString {
         var textAttrs = [TextAttribute]()
@@ -507,10 +519,10 @@ public extension String {
     /**
         Attribute matched subpatterns and trim
         
-        :param: attributes  an array of TextAttribute objects
-        :param: font    default font
+        - parameter attributes:  an array of TextAttribute objects
+        - parameter font:    default font
         
-        :returns: an attributed string with styles applied
+        - returns: an attributed string with styles applied
     */
     public func attribute(attributes: [TextAttribute], font: UIFont? = nil) -> NSAttributedString {
         return RegExp(attributes: attributes).attribute(self, font: font)
@@ -551,19 +563,19 @@ public extension String {
                 var font = UIFont.systemFontOfSize(16)
                 var attrStr = str.attributeHtml(map: ["p": [style, font]])
 
-        :param: map override default html properties passing in an array of variables which can be either NSParagraphStyle, UIFont, or UIColor variables.
+        - parameter map: override default html properties passing in an array of variables which can be either NSParagraphStyle, UIFont, or UIColor variables.
     
-        :returns:    an attributed strings without html tags
+        - returns:    an attributed strings without html tags
     */
     public func attributeHtml(map: [String:[AnyObject]] = [String:[AnyObject]]()) -> NSAttributedString {
-        var str = self.decodeHtmlSpecialCharacters().gsub("\\<.*br>", "\n")
+        let str = self.decodeHtmlSpecialCharacters().gsub("\\<.*br>", "\n")
         
-        var paragraphStyle = NSParagraphStyle()
+        let paragraphStyle = NSParagraphStyle()
         paragraphStyle.setValue(CGFloat(17), forKey: "firstLineHeadIndent")
         paragraphStyle.setValue(CGFloat(20), forKey: "headIndent")
         paragraphStyle.setValue(CGFloat(12), forKey: "paragraphSpacing")
         
-        var listStyle = NSParagraphStyle()
+        let listStyle = NSParagraphStyle()
         listStyle.setValue(CGFloat(20), forKey: "firstLineHeadIndent")
         listStyle.setValue(CGFloat(30), forKey: "headIndent")
         listStyle.setValue(CGFloat(7), forKey: "paragraphSpacing")
@@ -613,21 +625,21 @@ public extension String {
     }
     
     internal func toMutable() -> NSMutableString {
-        var capacity = Swift.count(self.utf16)
-        var mutable = NSMutableString(capacity: capacity)
+        let capacity = self.utf16.count
+        let mutable = NSMutableString(capacity: capacity)
         mutable.appendString(self)
         return mutable
     }
     
     internal func toRange() -> NSRange {
-        let capacity = Swift.count(self.utf16)
+        let capacity = self.utf16.count
         return NSMakeRange(0, capacity)
     }
 }
 
 internal extension NSMutableString {
     internal func gsub(pattern: String, _ replacement: String) -> NSMutableString {
-        var regex = RegExp(pattern)
+        let regex = RegExp(pattern)
         return regex.gsub(self, replacement)
     }
     
@@ -644,10 +656,10 @@ internal extension NSMutableAttributedString {
 
 internal extension NSRange {
     internal func toStringIndexRange(input: String) -> Range<String.Index> {
-        if location < count(input.utf16) {
-            var startIndex = advance(input.startIndex, location)
-            var endIndex = advance(input.startIndex, location + length)
-            var range = Range(start: startIndex, end: endIndex)
+        if location < input.utf16.count {
+            let startIndex = input.startIndex.advancedBy(location)
+            let endIndex = input.startIndex.advancedBy(location + length)
+            let range = Range(start: startIndex, end: endIndex)
             //println(input.substringWithRange(range))
             return range
         }

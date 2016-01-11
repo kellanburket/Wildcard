@@ -55,7 +55,7 @@ internal class RegExpMatch: Equatable {
         return match.string
     }
     
-    internal func addSubexpression(var sub: RegExpMatch) {
+    internal func addSubexpression(sub: RegExpMatch) {
         
         //println("\(sub.fullrange), \(sub.subrange): \(fullrange)")
         sub.fullrange = NSRange(
@@ -76,18 +76,20 @@ internal class RegExpMatch: Equatable {
     }
     
     internal func applyAttributes(inout string: NSMutableAttributedString) {
-        var finalAttributes = [NSObject: AnyObject]()
+        var finalAttributes = [String: AnyObject]()
         
         for attribute in attributes {
             if let attrs = attribute.getAttributes() {
                 for (key, value) in attrs {
-                    finalAttributes[key] = value
+                    if let attribute_key = key as? String {
+                        finalAttributes[attribute_key] = value
+                    }
                 }
             }
         }
         
-        var replacementRange = NSRange(location: 0, length: string.length)
-        //println(finalAttributes)
+        let replacementRange = NSRange(location: 0, length: string.length)
+
         string.setAttributes(finalAttributes, range: replacementRange)
     }
     
@@ -98,12 +100,16 @@ internal class RegExpMatch: Equatable {
                 if let matches = RegExp(sub.pattern).getSubstringRanges(replacement) {
                     
                     for match in matches {
-                        var substring = NSMutableAttributedString(string: match.substring)
-                        //println(sub.attributes)
+                        var substring = NSMutableAttributedString(
+                            string: match.substring
+                        )
+                        
                         sub.applyAttributes(&substring)
                         
-                        var range = match.subrange
-                        replacement.replaceCharactersInRange(match.fullrange, withAttributedString: substring)
+                        replacement.replaceCharactersInRange(
+                            match.fullrange,
+                            withAttributedString: substring
+                        )
                     }
                 }
             }
@@ -114,16 +120,16 @@ internal class RegExpMatch: Equatable {
         for setA in sets {
             for setB in sets {
                 if setA != setB {
-                    var intersection = NSIntersectionRange(setA.fullrange, setB.fullrange)
+                    let intersection = NSIntersectionRange(setA.fullrange, setB.fullrange)
                     if intersection.location > 0 && intersection.length > 0 {
-                        //println("Intersection: \(setA.fullrange) : \(setA.fullstring), \(setB.fullrange) : \(setB.fullstring)")
+
                         if setA.fullrange.location <= setB.fullrange.location {
-                            if let index = find(sets, setB) {
+                            if let index = sets.indexOf(setB) {
                                 sets.removeAtIndex(index)
                                 setA.addSubexpression(setB)
                             }
                         } else {
-                            if let index = find(sets, setA) {
+                            if let index = sets.indexOf(setA) {
                                 sets.removeAtIndex(index)
                                 setB.addSubexpression(setA)
                             }
@@ -137,7 +143,7 @@ internal class RegExpMatch: Equatable {
             }
         }
         
-        sets.sort {
+        sets.sortInPlace {
             $0.fullrange.location > $1.fullrange.location
         }
     }

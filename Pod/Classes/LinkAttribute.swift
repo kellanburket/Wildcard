@@ -26,11 +26,11 @@ public class LinkAttribute: TextAttribute {
     
                 Link 1 blah blah blah Link2
         
-        :param: pattern pattern to link; include a subpattern--this is the portion of the link that will be visible; the total number of matches should equal the total number of links passed into the `links` argument
-        :param: links   an array of links to apply to the matched text segment; link index 0 should match the first pattern match and so on and so forth
-        :param: attribute   any additional text attributes to be applied to link text
+        - parameter pattern: pattern to link; include a subpattern--this is the portion of the link that will be visible; the total number of matches should equal the total number of links passed into the `links` argument
+        - parameter links:   an array of links to apply to the matched text segment; link index 0 should match the first pattern match and so on and so forth
+        - parameter attribute:   any additional text attributes to be applied to link text
     */
-    public init(pattern: String, var links: [String], attribute: [NSObject: AnyObject]) {
+    public init(pattern: String, links: [String], attribute: [NSObject: AnyObject]) {
         self.links = links
         super.init(pattern: pattern, attribute: attribute)
     }

@@ -19,8 +19,8 @@ public class TextAttribute: NSObject {
     /**
         Initialize a TextAttribute with a pattern and links
         
-        :param: pattern pattern to match against
-        :param: a dictionary of attributes
+        - parameter pattern: pattern to match against
+        - parameter a: dictionary of attributes
     */
     public init(pattern: String, attribute: [NSObject: AnyObject]) {
         self.attribute = attribute
@@ -28,7 +28,7 @@ public class TextAttribute: NSObject {
     }
     
     internal func addMatch(input: String, _ full: NSRange, _ sub: NSRange) {
-        var match = RegExpMatch(
+        let match = RegExpMatch(
             pattern: pattern,
             match: (input.substringWithNSRange(full), full),
             submatches: [(input.substringWithNSRange(sub), sub)]
